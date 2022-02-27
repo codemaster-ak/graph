@@ -1,166 +1,196 @@
-import React, {useState} from 'react';
-import {Layer, Line, Rect, Stage, Text} from "react-konva";
-import {Border} from "./Border";
-import {INITIAL_STATE, SIZE} from "./consts";
+import React, {useRef, useState} from 'react';
+import {Circle, Layer, Line, Stage} from "react-konva";
+import Border from "./Border";
+import {SIZE} from "./consts";
+import DropDownMenu from "./DropDownMenu";
 
-function createConnectionPoints(source, destination) {
-    return [source.x, source.y, destination.x, destination.y];
-}
+const Canvas = ({steps, setSteps}) => {
 
-function hasIntersection(position, step) {
-    return !(
-        step.x > position.x ||
-        step.x + SIZE < position.x ||
-        step.y > position.y ||
-        step.y + SIZE < position.y
-    );
-}
+    const stageRef = useRef(undefined)
 
-function detectConnection(position, id, steps) {
-    const intersectingStep = Object.keys(steps).find((key) => {
-        return key !== id && hasIntersection(position, steps[key]);
-    });
-    if (intersectingStep) {
-        return intersectingStep;
+    const [selectedStep, setSelectedStep] = useState(null)
+    const [connectionPreview, setConnectionPreview] = useState(null)
+    const [connections, setConnections] = useState([])
+
+    const [menuVisible, setMenuVisible] = useState(false)
+    const [menuStyle, setMenuStyle] = useState({})
+    const [selectedEntity, setSelectedEntity] = useState(false)
+
+    const createConnectionPoints = (source, destination) => {
+        return [source.x, source.y, destination.x, destination.y]
     }
-    return null;
-}
 
-const Canvas = () => {
+    const hasIntersection = (position, step) => {
+        const radius = Math.sqrt(Math.pow(position.x - step.x, 2) + Math.pow(position.x - step.x, 2))
+        return SIZE - radius > 0
+    }
 
-    const [selectedStep, setSelectedStep] = useState(null);
-    const [connectionPreview, setConnectionPreview] = useState(null);
-    const [connections, setConnections] = useState([]);
-    const [steps, setSteps] = useState(INITIAL_STATE.steps);
+    const detectConnection = (position, id, steps) => {
+        return Object.keys(steps).find(step => {
+            return step !== id && hasIntersection(position, steps[step]);
+        })
+    }
 
-    function handleSelection(id) {
+    const deleteConnection = () => {
+        setConnections(connections.filter(connection => {
+            return connection.from !== selectedEntity.from || connection.to !== selectedEntity.to
+        }))
+        setMenuVisible(false)
+    }
+
+    const changeWeight = (position, id, steps) => {
+        console.log('changeWeight')
+        setMenuVisible(false)
+    }
+
+
+    const handleOnClick = (id) => {
         if (selectedStep === id) {
-            setSelectedStep(null);
+            setSelectedStep(null)
         } else {
-            setSelectedStep(id);
+            setSelectedStep(id)
         }
     }
 
-    function handleStepDrag(e, key) {
-        const position = e.target.position();
+    const handleOnContextMenu = (id) => {
+        if (selectedEntity === id) {
+            setSelectedEntity(undefined)
+        } else {
+            const positionX = stageRef.current.getPointerPosition().x
+            const positionY = stageRef.current.getPointerPosition().y
+            setMenuStyle({position: 'absolute', top: positionY.valueOf(), left: positionX.valueOf()})
+            setSelectedEntity(id)
+        }
+    }
+
+    const handleStepDrag = (event, key) => {
+        const position = event.target.position()
         setSteps({
             ...steps,
             [key]: {
                 ...steps[key],
                 ...position
             }
-        });
+        })
     }
 
-    function handleAnchorDragStart(e) {
-        const position = e.target.position();
+    const handleAnchorDragStart = (event) => {
+        const position = event.target.position()
         setConnectionPreview(
             <Line
                 x={position.x}
                 y={position.y}
                 points={createConnectionPoints(position, position)}
-                stroke="black"
+                stroke='black'
                 strokeWidth={2}
             />
-        );
+        )
     }
 
-    function getMousePos(e) {
-        const position = e.target.position();
-        const stage = e.target.getStage();
-        const pointerPosition = stage.getPointerPosition();
+    const getMousePos = (event) => {
+        const position = event.target.position()
+        const stage = event.target.getStage()
+        const pointerPosition = stage.getPointerPosition()
         return {
             x: pointerPosition.x - position.x,
             y: pointerPosition.y - position.y
-        };
+        }
     }
 
-    function handleAnchorDragMove(e) {
-        const position = e.target.position();
-        const mousePos = getMousePos(e);
+    const handleAnchorDragMove = (event) => {
+        const position = event.target.position()
+        const mousePos = getMousePos(event)
         setConnectionPreview(
             <Line
                 x={position.x}
                 y={position.y}
                 points={createConnectionPoints({x: 0, y: 0}, mousePos)}
-                stroke="black"
-                strokeWidth={2}
+                stroke='gray'
+                strokeWidth={3}
             />
-        );
+        )
     }
 
-    function handleAnchorDragEnd(e, id) {
-        setConnectionPreview(null);
-        const stage = e.target.getStage();
-        const mousePos = stage.getPointerPosition();
-        const connectionTo = detectConnection(mousePos, id, steps);
-        if (connectionTo !== null) {
+    const handleAnchorDragEnd = (event, id) => {
+        setConnectionPreview(null)
+        const stage = event.target.getStage()
+        const mousePos = stage.getPointerPosition()
+        const connectionTo = detectConnection(mousePos, id, steps)
+        if (connectionTo) {
             setConnections([
                 ...connections,
                 {
                     to: connectionTo,
                     from: id
                 }
-            ]);
+            ])
         }
     }
 
-    const stepObjs = Object.keys(steps).map((key) => {
-        const {x, y, colour} = steps[key];
-        return (
-            <Rect
-                key={key}
-                x={x}
-                y={y}
-                width={SIZE}
-                height={SIZE}
-                fill={colour}
-                onClick={() => handleSelection(key)}
-                draggable
-                onDragMove={(e) => handleStepDrag(e, key)}
-                perfectDrawEnabled={false}
-            />
-        );
-    });
+    const onContextMenu = (event) => {
+        event.evt.preventDefault()
+        if (!(event.target === stageRef.current)) setMenuVisible(true)
+    }
+
+    const stepObjs = Object.keys(steps).map(step => {
+        const {x, y, colour} = steps[step]
+        return <Circle
+            key={step}
+            x={x}
+            y={y}
+            radius={SIZE}
+            fill={colour}
+            onClick={() => handleOnClick(step)}
+            draggable
+            onDragMove={(e) => handleStepDrag(e, step)}
+            perfectDrawEnabled={false}
+        />
+
+    })
+
     const connectionObjs = connections.map((connection) => {
-        const fromStep = steps[connection.from];
-        const toStep = steps[connection.to];
+        const fromStep = steps[connection.from]
+        const toStep = steps[connection.to]
         const lineEnd = {
             x: toStep.x - fromStep.x,
             y: toStep.y - fromStep.y
-        };
-        const points = createConnectionPoints({x: 0, y: 0}, lineEnd);
-        return (
-            <Line
-                x={fromStep.x + SIZE / 2}
-                y={fromStep.y + SIZE / 2}
-                points={points}
-                stroke="orange"
-                strokeWidth={5}
-            />
-        );
-    });
+        }
+        const points = createConnectionPoints({x: 0, y: 0}, lineEnd)
+        return <Line
+            key={connection.from + connection.to}
+            x={fromStep.x}
+            y={fromStep.y}
+            points={points}
+            stroke='black'
+            strokeWidth={3}
+            onContextMenu={() => handleOnContextMenu(connection)}
+        />
+    })
+
     const borders =
         selectedStep !== null ? (
             <Border
                 id={selectedStep}
                 step={steps[selectedStep]}
-                onAnchorDragEnd={(e) => handleAnchorDragEnd(e, selectedStep)}
+                onAnchorDragEnd={event => handleAnchorDragEnd(event, selectedStep)}
                 onAnchorDragMove={handleAnchorDragMove}
                 onAnchorDragStart={handleAnchorDragStart}
             />
-        ) : null;
+        ) : null
 
-    return <Stage width={600} height={600}>
-        <Layer>
-            <Text text="Click a rectangle to select it. Drag the anchor to create a connection between the objects"/>
-            {stepObjs && stepObjs}
-            {borders && borders}
-            {connectionObjs && connectionObjs}
-            {connectionPreview && connectionPreview}
-        </Layer>
-    </Stage>
+    return <div>
+        <Stage width={600} height={600} onContextMenu={event => onContextMenu(event)} ref={stageRef}>
+            <Layer>
+                {/** порядок borders и stepObjs не менять*/}
+                {borders && borders}
+                {stepObjs && stepObjs}
+                {connectionObjs && connectionObjs}
+                {connectionPreview && connectionPreview}
+            </Layer>
+        </Stage>
+        {menuVisible &&
+        <DropDownMenu deleteConnection={deleteConnection} changeWeight={changeWeight} menuStyle={menuStyle}/>}
+    </div>
 }
 
 export default Canvas;
-
