@@ -3,12 +3,13 @@ import {Circle, Layer, Line, Stage} from "react-konva";
 import Border from "./Border";
 import {SIZE} from "./consts";
 import DropDownMenu from "./DropDownMenu";
+import getMousePos from "../functions/functions";
 
-const Canvas = ({steps, setSteps}) => {
+const Canvas = ({points, setPoints, add}) => {
 
     const stageRef = useRef(undefined)
 
-    const [selectedStep, setSelectedStep] = useState(null)
+    const [selectedPoint, setSelectedPoint] = useState(null)
     const [connectionPreview, setConnectionPreview] = useState(null)
     const [connections, setConnections] = useState([])
 
@@ -20,14 +21,14 @@ const Canvas = ({steps, setSteps}) => {
         return [source.x, source.y, destination.x, destination.y]
     }
 
-    const hasIntersection = (position, step) => {
-        const radius = Math.sqrt(Math.pow(position.x - step.x, 2) + Math.pow(position.x - step.x, 2))
+    const hasIntersection = (position, point) => {
+        const radius = Math.sqrt(Math.pow(position.x - point.x, 2) + Math.pow(position.x - point.x, 2))
         return SIZE - radius > 0
     }
 
-    const detectConnection = (position, id, steps) => {
-        return Object.keys(steps).find(step => {
-            return step !== id && hasIntersection(position, steps[step]);
+    const detectConnection = (position, id, points) => {
+        return Object.keys(points).find(point => {
+            return point !== id && hasIntersection(position, points[point]);
         })
     }
 
@@ -38,17 +39,25 @@ const Canvas = ({steps, setSteps}) => {
         setMenuVisible(false)
     }
 
-    const changeWeight = (position, id, steps) => {
+    const deletePoint = (point) => {
+        let copyPoints = JSON.parse(JSON.stringify(points))
+        setConnections(connections.filter(connection => {
+            return connection.from !== point && connection.to !== point
+        }))
+        delete copyPoints[point]
+        setPoints(copyPoints)
+    }
+
+    const changeWeight = () => {
         console.log('changeWeight')
         setMenuVisible(false)
     }
 
-
     const handleOnClick = (id) => {
-        if (selectedStep === id) {
-            setSelectedStep(null)
+        if (selectedPoint === id) {
+            setSelectedPoint(null)
         } else {
-            setSelectedStep(id)
+            setSelectedPoint(id)
         }
     }
 
@@ -63,12 +72,12 @@ const Canvas = ({steps, setSteps}) => {
         }
     }
 
-    const handleStepDrag = (event, key) => {
+    const handlePointDrag = (event, key) => {
         const position = event.target.position()
-        setSteps({
-            ...steps,
+        setPoints({
+            ...points,
             [key]: {
-                ...steps[key],
+                ...points[key],
                 ...position
             }
         })
@@ -87,15 +96,15 @@ const Canvas = ({steps, setSteps}) => {
         )
     }
 
-    const getMousePos = (event) => {
-        const position = event.target.position()
-        const stage = event.target.getStage()
-        const pointerPosition = stage.getPointerPosition()
-        return {
-            x: pointerPosition.x - position.x,
-            y: pointerPosition.y - position.y
-        }
-    }
+    // const getMousePos = (event) => {
+    //     const position = event.target.position()
+    //     const stage = event.target.getStage()
+    //     const pointerPosition = stage.getPointerPosition()
+    //     return {
+    //         x: pointerPosition.x - position.x,
+    //         y: pointerPosition.y - position.y
+    //     }
+    // }
 
     const handleAnchorDragMove = (event) => {
         const position = event.target.position()
@@ -115,13 +124,14 @@ const Canvas = ({steps, setSteps}) => {
         setConnectionPreview(null)
         const stage = event.target.getStage()
         const mousePos = stage.getPointerPosition()
-        const connectionTo = detectConnection(mousePos, id, steps)
+        const connectionTo = detectConnection(mousePos, id, points)
         if (connectionTo) {
             setConnections([
                 ...connections,
                 {
                     to: connectionTo,
-                    from: id
+                    from: id,
+                    weight: 1
                 }
             ])
         }
@@ -129,38 +139,42 @@ const Canvas = ({steps, setSteps}) => {
 
     const onContextMenu = (event) => {
         event.evt.preventDefault()
-        if (!(event.target === stageRef.current)) setMenuVisible(true)
+        if (!(event.target === stageRef.current)) {
+            setMenuVisible(true)
+        }
+        if (menuVisible) setMenuVisible(false)
     }
 
-    const stepObjs = Object.keys(steps).map(step => {
-        const {x, y, colour} = steps[step]
+    const pointObjs = Object.keys(points).map(point => {
+        const {x, y, colour} = points[point]
         return <Circle
-            key={step}
+            key={point}
             x={x}
             y={y}
             radius={SIZE}
             fill={colour}
-            onClick={() => handleOnClick(step)}
+            onClick={() => handleOnClick(point)}
+            onDblClick={() => deletePoint(point)}
+            onContextMenu={() => handleOnContextMenu(point)}
             draggable
-            onDragMove={(e) => handleStepDrag(e, step)}
+            onDragMove={(e) => handlePointDrag(e, point)}
             perfectDrawEnabled={false}
         />
-
     })
 
     const connectionObjs = connections.map((connection) => {
-        const fromStep = steps[connection.from]
-        const toStep = steps[connection.to]
+        const fromPoint = points[connection.from]
+        const toPoint = points[connection.to]
         const lineEnd = {
-            x: toStep.x - fromStep.x,
-            y: toStep.y - fromStep.y
+            x: toPoint.x - fromPoint.x,
+            y: toPoint.y - fromPoint.y
         }
-        const points = createConnectionPoints({x: 0, y: 0}, lineEnd)
+        const connectionPoints = createConnectionPoints({x: 0, y: 0}, lineEnd)
         return <Line
-            key={connection.from + connection.to}
-            x={fromStep.x}
-            y={fromStep.y}
-            points={points}
+            key={connection.from + connection.to + Math.random()}
+            x={fromPoint.x}
+            y={fromPoint.y}
+            points={connectionPoints}
             stroke='black'
             strokeWidth={3}
             onContextMenu={() => handleOnContextMenu(connection)}
@@ -168,29 +182,38 @@ const Canvas = ({steps, setSteps}) => {
     })
 
     const borders =
-        selectedStep !== null ? (
+        selectedPoint !== null ? (
             <Border
-                id={selectedStep}
-                step={steps[selectedStep]}
-                onAnchorDragEnd={event => handleAnchorDragEnd(event, selectedStep)}
+                id={selectedPoint}
+                point={points[selectedPoint]}
+                onAnchorDragEnd={event => handleAnchorDragEnd(event, selectedPoint)}
                 onAnchorDragMove={handleAnchorDragMove}
                 onAnchorDragStart={handleAnchorDragStart}
             />
         ) : null
 
-    return <div>
-        <Stage width={600} height={600} onContextMenu={event => onContextMenu(event)} ref={stageRef}>
+    return <>
+        <Stage
+            width={600}
+            height={600}
+            onDblClick={event => add(event, stageRef)}
+            onContextMenu={event => onContextMenu(event)}
+            ref={stageRef}
+        >
             <Layer>
-                {/** порядок borders и stepObjs не менять*/}
+                {/** порядок borders и pointObjs не менять*/}
                 {borders && borders}
-                {stepObjs && stepObjs}
+                {pointObjs && pointObjs}
                 {connectionObjs && connectionObjs}
                 {connectionPreview && connectionPreview}
             </Layer>
         </Stage>
-        {menuVisible &&
-        <DropDownMenu deleteConnection={deleteConnection} changeWeight={changeWeight} menuStyle={menuStyle}/>}
-    </div>
+        {menuVisible && <DropDownMenu
+            deleteConnection={deleteConnection}
+            changeWeight={changeWeight}
+            menuStyle={menuStyle}
+        />}
+    </>
 }
 
 export default Canvas;

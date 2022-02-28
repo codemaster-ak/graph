@@ -2,40 +2,31 @@ import React, {useState} from 'react';
 import {Button} from "antd";
 import "./App.css";
 import Matrix from "./components/Matrix";
-import CanvasTest from "./components/CanvasTest";
 import Canvas from "./components/Canvas";
 import {INITIAL_STATE} from "./components/consts";
+import getMousePos from "./functions/functions";
+import Point from "./components/Point";
 
 const App = () => {
 
     const [mode, setMode] = useState('viewing')
+    const [points, setPoints] = useState(INITIAL_STATE)
 
-    const [steps, setSteps] = useState(INITIAL_STATE)
-    let ctx
-
-    const draw = () => {
-        setMode('adding')
-    }
-    const draw2 = () => {
-        ctx.restore()
-    }
-
-    const add = () => {
-        const new_step = Object.values(steps).length + 1 + ''
-        setSteps({
-            ...steps, [new_step]: {
-                x: 350,
-                y: 250,
-                colour: 'green'
-            }
-        })
+    const add = (event, stageRef) => {
+        event.evt.preventDefault()
+        if (event.target === stageRef.current) {
+            const mousePos = getMousePos(event)
+            const new_point = String(new Date().getTime())
+            setPoints({
+                ...points,
+                [new_point]: new Point(mousePos.x, mousePos.y)
+            })
+        }
     }
 
     return <div>
-        {/*<CanvasTest mode={mode}/>*/}
-        <Canvas add={add} steps={steps} setSteps={setSteps}/>
+        <Canvas add={add} points={points} setPoints={setPoints}/>
         <Button type='primary' onClick={add}>add item</Button>
-        <Button type='primary' onClick={draw2}>btn2</Button>
         <Matrix/>
     </div>
 }

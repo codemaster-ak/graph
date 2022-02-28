@@ -1,12 +1,12 @@
 import React from "react";
-import {Circle, Line} from "react-konva";
+import {Circle} from "react-konva";
 import Anchor from "./Anchor";
 import {SIZE} from "./consts";
 
-const points = [0, 0, SIZE, 0, SIZE, SIZE, 0, SIZE, 0, 0];
+const points = [0, 0, SIZE, 0, SIZE, SIZE, 0, SIZE, 0, 0]
 
 const Border = ({
-                    step,
+                    point,
                     id,
                     onAnchorDragStart,
                     onAnchorDragMove,
@@ -31,33 +31,32 @@ const Border = ({
         ]
     }
 
-    const {x, y} = step
-    const anchorPoints = getAnchorPoints(x, y)
+    const createAnchors = (point) => {
+        const anchorPoints = getAnchorPoints(point.x, point.y)
 
-    const anchors = anchorPoints.map((position, index) => (
-        <Anchor
-            key={`anchor-${index}`}
-            id={id}
-            x={position.x}
-            y={position.y}
-            onDragStart={onAnchorDragStart}
-            onDragMove={onAnchorDragMove}
-            onDragEnd={onAnchorDragEnd}
-        />
-    ))
+        return anchorPoints.map((position, index) => (
+            <Anchor
+                key={`anchor-${index}`}
+                id={id}
+                x={position.x}
+                y={position.y}
+                onDragStart={onAnchorDragStart}
+                onDragMove={onAnchorDragMove}
+                onDragEnd={onAnchorDragEnd}
+            />
+        ))
+    }
 
     return <>
-        {/*<Line*/}
-        {/*    x={x}*/}
-        {/*    y={y}*/}
-        {/*    points={points}*/}
-        {/*    stroke='black'*/}
-        {/*    strokeWidth={2}*/}
-        {/*    perfectDrawEnabled={false}*/}
-        {/*/>*/}
-        <Circle x={x}
-                y={y} stroke='black' strokeWidth={2} radius={SIZE} perfectDrawEnabled={false}/>
-        {anchors}
+        {point && <Circle
+            x={point.x}
+            y={point.y}
+            stroke='black'
+            strokeWidth={2}
+            radius={SIZE}
+            perfectDrawEnabled={false}
+        />}
+        {createAnchors(point)}
     </>
 }
 
