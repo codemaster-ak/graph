@@ -3,19 +3,20 @@ import {Circle, Layer, Line, Stage} from "react-konva";
 import Border from "./Border";
 import {SIZE} from "./consts";
 import DropDownMenu from "./DropDownMenu";
-import getMousePos from "../functions/functions";
+import getMousePos from "../functions/getMousePos";
+import Connection from "./Connection";
 
-const Canvas = ({points, setPoints, add}) => {
+const Canvas = ({points, setPoints, connections, setConnections, addPoint, addConnection}) => {
 
     const stageRef = useRef(undefined)
 
-    const [selectedPoint, setSelectedPoint] = useState(null)
+    const [selectedPoint, setSelectedPoint] = useState(undefined)
     const [connectionPreview, setConnectionPreview] = useState(null)
-    const [connections, setConnections] = useState([])
 
     const [menuVisible, setMenuVisible] = useState(false)
+    const [inputVisible, setInputVisible] = useState(false)
     const [menuStyle, setMenuStyle] = useState({})
-    const [selectedEntity, setSelectedEntity] = useState(false)
+    const [selectedEntity, setSelectedEntity] = useState(undefined)
 
     const createConnectionPoints = (source, destination) => {
         return [source.x, source.y, destination.x, destination.y]
@@ -26,9 +27,9 @@ const Canvas = ({points, setPoints, add}) => {
         return SIZE - radius > 0
     }
 
-    const detectConnection = (position, id, points) => {
-        return Object.keys(points).find(point => {
-            return point !== id && hasIntersection(position, points[point]);
+    const detectConnection = (position, point) => {
+        return points.find(p => {
+            return p.key !== point.key && hasIntersection(position, p)
         })
     }
 
@@ -39,48 +40,60 @@ const Canvas = ({points, setPoints, add}) => {
         setMenuVisible(false)
     }
 
-    const deletePoint = (point) => {
-        let copyPoints = JSON.parse(JSON.stringify(points))
+    const deletePoint = (key) => {
         setConnections(connections.filter(connection => {
-            return connection.from !== point && connection.to !== point
+            return connection.from !== key && connection.to !== key
         }))
-        delete copyPoints[point]
-        setPoints(copyPoints)
+        setPoints(points.filter(point => {
+            return point.key !== key
+        }))
     }
 
-    const changeWeight = () => {
-        console.log('changeWeight')
+    const changeWeight = (weight) => {
+        setConnections(connections.map(connection => {
+            if (connection.from === selectedEntity.from && connection.to === selectedEntity.to) {
+                connection.weight = weight
+            }
+            return connection
+        }))
+        setInputVisible(false)
         setMenuVisible(false)
     }
 
-    const handleOnClick = (id) => {
-        if (selectedPoint === id) {
-            setSelectedPoint(null)
+    const handleOnClick = (point) => {
+        if (selectedPoint?.key === point.key) {
+            setSelectedPoint(undefined)
         } else {
-            setSelectedPoint(id)
+            setSelectedPoint(point)
         }
     }
 
-    const handleOnContextMenu = (id) => {
-        if (selectedEntity === id) {
-            setSelectedEntity(undefined)
-        } else {
-            const positionX = stageRef.current.getPointerPosition().x
-            const positionY = stageRef.current.getPointerPosition().y
-            setMenuStyle({position: 'absolute', top: positionY.valueOf(), left: positionX.valueOf()})
-            setSelectedEntity(id)
+    const handleOnContextMenu = (event, entity) => {
+        event.evt.preventDefault()
+        if (entity instanceof Connection) {
+            if (selectedEntity === entity) {
+                setMenuVisible(false)
+                setInputVisible(false)
+                setSelectedEntity(undefined)
+            } else {
+                const positionX = stageRef.current.getPointerPosition().x
+                const positionY = stageRef.current.getPointerPosition().y
+                setMenuVisible(true)
+                setMenuStyle({position: 'absolute', top: positionY.valueOf(), left: positionX.valueOf()})
+                setSelectedEntity(entity)
+            }
         }
     }
 
     const handlePointDrag = (event, key) => {
         const position = event.target.position()
-        setPoints({
-            ...points,
-            [key]: {
-                ...points[key],
-                ...position
+        setPoints(points.map(point => {
+            if (point.key === key) {
+                point.x = position.x
+                point.y = position.y
             }
-        })
+            return point
+        }))
     }
 
     const handleAnchorDragStart = (event) => {
@@ -96,16 +109,6 @@ const Canvas = ({points, setPoints, add}) => {
         )
     }
 
-    // const getMousePos = (event) => {
-    //     const position = event.target.position()
-    //     const stage = event.target.getStage()
-    //     const pointerPosition = stage.getPointerPosition()
-    //     return {
-    //         x: pointerPosition.x - position.x,
-    //         y: pointerPosition.y - position.y
-    //     }
-    // }
-
     const handleAnchorDragMove = (event) => {
         const position = event.target.position()
         const mousePos = getMousePos(event)
@@ -120,51 +123,37 @@ const Canvas = ({points, setPoints, add}) => {
         )
     }
 
-    const handleAnchorDragEnd = (event, id) => {
-        setConnectionPreview(null)
-        const stage = event.target.getStage()
-        const mousePos = stage.getPointerPosition()
-        const connectionTo = detectConnection(mousePos, id, points)
-        if (connectionTo) {
-            setConnections([
-                ...connections,
-                {
-                    to: connectionTo,
-                    from: id,
-                    weight: 1
-                }
-            ])
-        }
-    }
 
     const onContextMenu = (event) => {
         event.evt.preventDefault()
-        if (!(event.target === stageRef.current)) {
-            setMenuVisible(true)
+        // if (event.target !== stageRef.current) {
+        //     setMenuVisible(true)
+        // }
+        if (menuVisible) {
+            setInputVisible(false)
+            setMenuVisible(false)
         }
-        if (menuVisible) setMenuVisible(false)
     }
 
-    const pointObjs = Object.keys(points).map(point => {
-        const {x, y, colour} = points[point]
+    const pointObjs = points.map(point => {
         return <Circle
-            key={point}
-            x={x}
-            y={y}
+            key={point.key}
+            x={point.x}
+            y={point.y}
             radius={SIZE}
-            fill={colour}
+            fill={point.colour}
             onClick={() => handleOnClick(point)}
-            onDblClick={() => deletePoint(point)}
-            onContextMenu={() => handleOnContextMenu(point)}
+            onDblClick={() => deletePoint(point.key)}
+            onContextMenu={event => handleOnContextMenu(event, point)}
             draggable
-            onDragMove={(e) => handlePointDrag(e, point)}
+            onDragMove={event => handlePointDrag(event, point.key)}
             perfectDrawEnabled={false}
         />
     })
 
     const connectionObjs = connections.map((connection) => {
-        const fromPoint = points[connection.from]
-        const toPoint = points[connection.to]
+        const fromPoint = points.find(point => point.key === connection.from)
+        const toPoint = points.find(point => point.key === connection.to)
         const lineEnd = {
             x: toPoint.x - fromPoint.x,
             y: toPoint.y - fromPoint.y
@@ -175,43 +164,45 @@ const Canvas = ({points, setPoints, add}) => {
             x={fromPoint.x}
             y={fromPoint.y}
             points={connectionPoints}
-            stroke='black'
+            stroke={connection.colour}
             strokeWidth={3}
-            onContextMenu={() => handleOnContextMenu(connection)}
+            onContextMenu={event => handleOnContextMenu(event, connection)}
         />
     })
 
-    const borders =
-        selectedPoint !== null ? (
-            <Border
-                id={selectedPoint}
-                point={points[selectedPoint]}
-                onAnchorDragEnd={event => handleAnchorDragEnd(event, selectedPoint)}
-                onAnchorDragMove={handleAnchorDragMove}
-                onAnchorDragStart={handleAnchorDragStart}
-            />
-        ) : null
+    const borders = selectedPoint
+        ? <Border
+            id={selectedPoint.key}
+            point={selectedPoint}
+            onAnchorDragEnd={event => addConnection(event, selectedPoint, setConnectionPreview, detectConnection)}
+            onAnchorDragMove={handleAnchorDragMove}
+            onAnchorDragStart={handleAnchorDragStart}
+        />
+        : null
 
     return <>
         <Stage
             width={600}
             height={600}
-            onDblClick={event => add(event, stageRef)}
+            onDblClick={event => addPoint(event, stageRef)}
             onContextMenu={event => onContextMenu(event)}
             ref={stageRef}
         >
             <Layer>
-                {/** порядок borders и pointObjs не менять*/}
+                {/** порядок borders и pointObjs не менять */}
                 {borders && borders}
                 {pointObjs && pointObjs}
                 {connectionObjs && connectionObjs}
-                {connectionPreview && connectionPreview}
+                {connectionPreview}
             </Layer>
         </Stage>
         {menuVisible && <DropDownMenu
             deleteConnection={deleteConnection}
             changeWeight={changeWeight}
             menuStyle={menuStyle}
+            inputVisible={inputVisible}
+            setInputVisible={setInputVisible}
+            selectedEntity={selectedEntity}
         />}
     </>
 }

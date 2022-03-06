@@ -3,8 +3,6 @@ import {Circle} from "react-konva";
 import Anchor from "./Anchor";
 import {SIZE} from "./consts";
 
-const points = [0, 0, SIZE, 0, SIZE, SIZE, 0, SIZE, 0, 0]
-
 const Border = ({
                     point,
                     id,
@@ -14,6 +12,7 @@ const Border = ({
                 }) => {
 
     const getAnchorPoints = (x, y) => {
+        if (!x || !y) return []
         return [
             {
                 x: x - SIZE - 10,
@@ -32,10 +31,10 @@ const Border = ({
     }
 
     const createAnchors = (point) => {
-        const anchorPoints = getAnchorPoints(point.x, point.y)
+        const anchorPoints = getAnchorPoints(point?.x, point?.y)
 
-        return anchorPoints.map((position, index) => (
-            <Anchor
+        return anchorPoints.map((position, index) => {
+            return <Anchor
                 key={`anchor-${index}`}
                 id={id}
                 x={position.x}
@@ -44,7 +43,7 @@ const Border = ({
                 onDragMove={onAnchorDragMove}
                 onDragEnd={onAnchorDragEnd}
             />
-        ))
+        })
     }
 
     return <>
