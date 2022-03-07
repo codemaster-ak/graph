@@ -1,11 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import "./App.css";
 import Matrix from "./components/Matrix";
 import Canvas from "./components/Canvas";
 import getMousePos from "./functions/getMousePos";
 import Point from "./components/Point";
-import Dijkstra from "./functions/Dijkstra";
-import {MAX_INTEGER, MIN_INTEGER} from "./components/consts";
 import Connection from "./components/Connection";
 import {message} from "antd";
 
@@ -16,24 +14,8 @@ const App = () => {
      * Значение - это вес ребра между вершиной и вершиной, 0 означает отсутствие самоконтроля, Infinity означает отсутствие ребра
      * */
 
-    const matrix = [
-        [MIN_INTEGER, 9, 2, MAX_INTEGER, 6],
-        [9, MIN_INTEGER, 3, MAX_INTEGER, MAX_INTEGER],
-        [2, 3, MIN_INTEGER, 5, MAX_INTEGER],
-        [MAX_INTEGER, MAX_INTEGER, 5, MIN_INTEGER, 1],
-        [6, MAX_INTEGER, MAX_INTEGER, 1, MIN_INTEGER]
-    ]
-
     const [points, setPoints] = useState([])
     const [connections, setConnections] = useState([])
-
-    useEffect(() => {
-        try {
-            Dijkstra(matrix,0) // [ 0, 5, 2, 7, 6 ]
-        } catch (e) {
-            console.error(e)
-        }
-    }, [])
 
     const addPoint = (event, stageRef) => {
         if (event.target === stageRef?.current) {
@@ -93,7 +75,9 @@ const App = () => {
         />
         <Matrix
             points={points}
+            setPoints={setPoints}
             connections={connections}
+            setConnections={setConnections}
             addPoint={addPoint}
             addConnection={addConnection}
         />

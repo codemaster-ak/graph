@@ -2,14 +2,38 @@ import React, {useEffect, useState} from 'react';
 import {Button, message, Select} from "antd";
 import toConnectionMatrix from "../functions/toConnectionMatrix";
 import Dijkstra from "../functions/Dijkstra";
+import {DownloadOutlined, SaveOutlined} from "@ant-design/icons";
+import Connection from "./Connection";
+import Point from "./Point";
 
 const {Option} = Select
 
-const Matrix = ({points, connections, addPoint, addConnection}) => {
+const Matrix = ({points, setPoints, connections, setConnections, addPoint, addConnection}) => {
+
+    const baseURL = 'http://127.0.0.1:4000'
 
     const [incMatrix, setIncMatrix] = useState([[]])
     const [fromPoint, setFromPoint] = useState(undefined)
     const [toPoint, setToPoint] = useState(undefined)
+    const [files, setFiles] = useState([])
+    const [selectedFile, setSelectedFile] = useState(undefined)
+
+    useEffect(async () => {
+        const init = {
+            mode: 'cors',
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                protocol: 'http',
+                'Content-Type': 'application/json'
+            }
+        }
+        await fetch(baseURL, init).then((response) => {
+            if (response.ok) return response.json()
+        }).then(data => {
+            setFiles([...data])
+        })
+    }, [])
 
     useEffect(() => {
         let rows = [[{name: ''}], ...points.map(point => {
@@ -33,7 +57,6 @@ const Matrix = ({points, connections, addPoint, addConnection}) => {
                 }
             }
         }
-        toConnectionMatrix(rows)
         setIncMatrix(rows)
     }, [points, connections])
 
@@ -66,6 +89,64 @@ const Matrix = ({points, connections, addPoint, addConnection}) => {
         } catch (e) {
             message.error(e).then()
         }
+    }
+
+    const download = async () => {
+        const init = {
+            mode: 'cors',
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                protocol: 'http',
+                'Content-Type': 'application/json'
+            }
+        }
+        await fetch(baseURL + '/' + selectedFile, init).then((response) => {
+            if (response.ok) return response.json()
+        }).then(data => {
+            if (Array.isArray(data)) {
+                setIncMatrix([...data])
+                parsePointsAndConnections(data)
+            }
+        })
+    }
+
+    const save = async () => {
+        const init = {
+            mode: 'cors',
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                protocol: 'http',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(incMatrix)
+        }
+        await fetch(baseURL, init).then((response) => {
+            if (response.ok) return response.json()
+        }).then()
+    }
+
+    const parsePointsAndConnections = (incMatrix) => {
+        incMatrix[0].shift()
+        let pointsTemp = []
+        for (let i = 0; i < incMatrix.length; i++) {
+            if (i > 0) {
+                delete incMatrix[i][0].name
+                pointsTemp.push(incMatrix[i][0])
+            }
+        }
+        setPoints(pointsTemp.map(point => {
+            return new Point(point.x, point.y, point.key, point.colour)
+        }))
+        setConnections(incMatrix[0].map(connection => {
+            return new Connection(
+                connection.connection.from,
+                connection.connection.to,
+                connection.connection.weight,
+                connection.connection.colour
+            )
+        }))
     }
 
     return <div>
@@ -107,6 +188,27 @@ const Matrix = ({points, connections, addPoint, addConnection}) => {
                     else return null
                 })}
             </Select>
+        </div>
+        <div className='flex-container'>
+            <Button
+                type='primary'
+                onClick={download}
+                icon={<DownloadOutlined style={{color: 'black'}}/>}
+            >
+                Загрузить матрицу
+            </Button>
+            <Select value={selectedFile} onChange={(value) => setSelectedFile(value)} style={{width: 100}}>
+                {files.map(file => {
+                    return <Option key={file.title} value={file.title}>{file.title}</Option>
+                })}
+            </Select>
+            <Button
+                type='primary'
+                onClick={save}
+                icon={<SaveOutlined style={{color: 'black'}}/>}
+            >
+                Сохранить матрицу
+            </Button>
         </div>
         <div className='flex-column' style={{maxWidth: 600, overflowX: 'auto'}}>
             {incMatrix.map((row, indexRow) => {
