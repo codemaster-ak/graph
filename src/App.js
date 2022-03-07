@@ -29,7 +29,7 @@ const App = () => {
 
     useEffect(() => {
         try {
-            Dijkstra(0, matrix) // [ 0, 5, 2, 7, 6 ]
+            Dijkstra(matrix,0) // [ 0, 5, 2, 7, 6 ]
         } catch (e) {
             console.error(e)
         }
@@ -63,7 +63,7 @@ const App = () => {
             if (connectionTo && !isExist) {
                 setConnections([
                     ...connections,
-                    new Connection(point.key, connectionTo.key, 1, 'black')
+                    new Connection(point.key, connectionTo.key, 1, '#333333')
                 ])
             }
         } else {

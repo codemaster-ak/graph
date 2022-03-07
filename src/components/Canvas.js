@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Circle, Layer, Line, Stage} from "react-konva";
+import {Circle, Layer, Line, Stage, Text} from "react-konva";
 import Border from "./Border";
 import {SIZE} from "./consts";
 import DropDownMenu from "./DropDownMenu";
@@ -180,6 +180,43 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
         />
         : null
 
+    const pointTitles = points.map(point => {
+        return <Text
+            key={point.key}
+            x={point.x - 9}
+            y={point.y - 28}
+            fontSize={16}
+            text={point.key.substring(point.key.length - 2)}
+            fill='red'
+            perfectDrawEnabled={false}
+        />
+    })
+
+    const connectionWeights = connections.map((connection) => {
+        const fromPoint = points.find(point => point.key === connection.from)
+        const toPoint = points.find(point => point.key === connection.to)
+        let x, y
+        if (toPoint.x > fromPoint.x) {
+            x = fromPoint.x + (toPoint.x - fromPoint.x) / 2
+        } else {
+            x = toPoint.x + (fromPoint.x - toPoint.x) / 2
+        }
+        if (toPoint.y > fromPoint.y) {
+            y = fromPoint.y + (toPoint.y - fromPoint.y) / 2
+        } else {
+            y = toPoint.y + (fromPoint.y - toPoint.y) / 2
+        }
+        return <Text
+            key={connection.from + connection.to + Math.random()}
+            x={x}
+            y={y - 15}
+            fontSize={16}
+            text={connection.weight}
+            fill='red'
+            perfectDrawEnabled={false}
+        />
+    })
+
     return <>
         <Stage
             width={600}
@@ -190,9 +227,11 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
         >
             <Layer>
                 {/** порядок borders и pointObjs не менять */}
-                {borders && borders}
-                {pointObjs && pointObjs}
-                {connectionObjs && connectionObjs}
+                {borders}
+                {pointObjs}
+                {pointTitles}
+                {connectionObjs}
+                {connectionWeights}
                 {connectionPreview}
             </Layer>
         </Stage>

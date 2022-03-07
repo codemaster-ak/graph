@@ -1,4 +1,4 @@
-export default function Dijkstra(start = 0, matrix) {
+export default function Dijkstra(matrix, start = 0) {
 
     const rowsCount = matrix.length, colsCount = matrix[0].length
 
@@ -38,7 +38,5 @@ export default function Dijkstra(start = 0, matrix) {
         })
     }
 
-    console.log(paths)
-    console.log(distances)
-    return distances
+    return [distances, paths]
 }
