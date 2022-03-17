@@ -149,89 +149,107 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
         }))
     }
 
-    return <div>
-        <div>
-            <Button
-                type='primary'
-                onClick={event => addPoint(event)}
-                disabled={incMatrix.length > 10}
-            >
-                Добавить вершину
-            </Button>
+    return <div className="flex-grow-1 flex-center"
+                >
+        <div className="matrix">
+            <div className='flex-column' style={{height: 570, overflowX: 'auto'}}>
+                {incMatrix.map((row, indexRow) => {
+                    return <div key={indexRow + ''} className='flex-container'>
+                        <div className='flex-container'>
+                            {row.map((colValue, indexCol) => {
+                                return <div
+                                    className='matrix-cell'
+                                    key={indexRow + indexCol + ''}
+                                >
+                                    {indexCol === 0
+                                        ? indexRow > 0
+                                            ? colValue.name
+                                            : ''
+                                        : indexRow > 0
+                                            ? colValue
+                                            : colValue.name}
+                                </div>
+                            })}
+                        </div>
+                    </div>
+                })}
+            </div>
         </div>
-        <div>
-            <Button
-                type='primary'
-                onClick={event => addConnection(event, [fromPoint, toPoint])}
-                disabled={!fromPoint || !toPoint || fromPoint === toPoint}
-            >
-                Добавить связь
-            </Button>
-            <div>
+        <div className="controls">
+
+
+            <div className='flex-column divider' style={{width: 210}}>
+                <div className="space-between">
+                    <Select placeholder="От"
+                            value={fromPoint} onChange={(value) => setFromPoint(value)} style={{width: 100}}>
+                        {incMatrix.map((row, index) => {
+                            if (index > 0) return <Option value={row[0].key} key={row[0].key}>{row[0].name}</Option>
+                            else return null
+                        })}
+                    </Select>
+                    <Select placeholder="До"
+                            value={toPoint} onChange={(value) => setToPoint(value)} style={{width: 100}}>
+                        {incMatrix.map((row, index) => {
+                            if (index > 0) return <Option value={row[0].key} key={row[0].key}>{row[0].name}</Option>
+                            else return null
+                        })}
+                    </Select>
+                </div>
                 <Button
                     type='primary'
                     onClick={computePath}
                     disabled={!fromPoint || !toPoint || fromPoint === toPoint}
+                    style={{marginTop: 10}}
                 >
                     Найти кратчайший путь
                 </Button>
             </div>
-            <Select value={fromPoint} onChange={(value) => setFromPoint(value)} style={{width: 100}}>
-                {incMatrix.map((row, index) => {
-                    if (index > 0) return <Option value={row[0].key} key={row[0].key}>{row[0].name}</Option>
-                    else return null
-                })}
-            </Select>
-            <Select value={toPoint} onChange={(value) => setToPoint(value)} style={{width: 100}}>
-                {incMatrix.map((row, index) => {
-                    if (index > 0) return <Option value={row[0].key} key={row[0].key}>{row[0].name}</Option>
-                    else return null
-                })}
-            </Select>
-        </div>
-        <div className='flex-container'>
-            <Button
-                type='primary'
-                onClick={download}
-                icon={<DownloadOutlined style={{color: 'black'}}/>}
-            >
-                Загрузить матрицу
-            </Button>
-            <Select value={selectedFile} onChange={(value) => setSelectedFile(value)} style={{width: 100}}>
-                {files.map(file => {
-                    return <Option key={file.title} value={file.title}>{file.title}</Option>
-                })}
-            </Select>
-            <Button
-                type='primary'
-                onClick={save}
-                icon={<SaveOutlined style={{color: 'black'}}/>}
-            >
-                Сохранить матрицу
-            </Button>
-        </div>
-        <div className='flex-column' style={{maxWidth: 600, overflowX: 'auto'}}>
-            {incMatrix.map((row, indexRow) => {
-                return <div key={indexRow + ''} className='flex-container'>
-                    <div className='flex-container'>
-                        {row.map((colValue, indexCol) => {
-                            return <div
-                                className='matrix-cell'
-                                key={indexRow + indexCol + ''}
-                            >
-                                {indexCol === 0
-                                    ? indexRow > 0
-                                        ? colValue.name
-                                        : ''
-                                    : indexRow > 0
-                                        ? colValue
-                                        : colValue.name}
-                            </div>
-                        })}
-                    </div>
+            <div className='flex-column divider'>
+                <Button
+                    type='primary'
+                    onClick={event => addPoint(event)}
+                    disabled={incMatrix.length > 10}
+                >
+                    Добавить вершину
+                </Button>
+
+                <Button
+                    type='primary'
+                    onClick={event => addConnection(event, [fromPoint, toPoint])}
+                    disabled={!fromPoint || !toPoint || fromPoint === toPoint}
+                    style={{marginTop: 10}}
+                >
+                    Добавить связь
+                </Button>
+            </div>
+            <div className='flex-column' style={{width: 210}}>
+                <Select placeholder="Выберите матрицу" style={{width: 210, marginBottom: 10}}
+                        value={selectedFile} onChange={(value) => setSelectedFile(value)}>
+                    {files.map(file => {
+                        return <Option key={file.title} value={file.title}>{file.title}</Option>
+                    })}
+                </Select>
+                <div className="space-between">
+                    <Button
+                        type='primary'
+                        onClick={download}
+                        // icon={<DownloadOutlined style={{color: 'white'}}/>}
+                        style={{width: 100}}
+                    >
+                        Загрузить
+                    </Button>
+                    <Button
+                        type='primary'
+                        onClick={save}
+                        // icon={<SaveOutlined style={{color: 'white'}}/>}
+                        style={{width: 100}}
+                    >
+                        Сохранить
+                    </Button>
                 </div>
-            })}
+            </div>
         </div>
+
     </div>
 }
 

@@ -26,13 +26,14 @@ app.get('/:fileName', ((req, res) => {
             fs.readFile(path.resolve(__dirname, 'files', fileName), 'utf8', (er, data) => {
                 res.status(200).send(data)
             })
-        } else res.status(200).json({message: 'Not found'})
+        } else res.status(404).json({message: 'Not found'})
     })
 }))
 
 app.post('/', (req, res) => {
     const content = JSON.stringify(req.body)
-    const fileName = String(Math.round(Math.random() * 1000)) + '.json'
+    const date = new Date
+    const fileName = String(date.getDate()).padStart(2,"0") +'-'+ String(date.getHours()).padStart(2,"0")+':'+ String(date.getMinutes()).padStart(2,"0") + '.json'
     fs.open(path.resolve(__dirname, 'files', fileName), 'w', (err) => {
         if (err) throw err
     })

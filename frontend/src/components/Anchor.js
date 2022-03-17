@@ -16,7 +16,7 @@ const Anchor = ({x, y, id, onDragMove, onDragEnd, onDragStart}) => {
         x={x}
         y={y}
         radius={5}
-        fill='black'
+        fill='#656565'
         draggable
         onDragStart={event => onDragStart(event, id)}
         onDragMove={event => onDragMove(event, id)}

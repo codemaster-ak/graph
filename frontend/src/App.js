@@ -45,7 +45,7 @@ const App = () => {
             if (connectionTo && !isExist) {
                 setConnections([
                     ...connections,
-                    new Connection(point.key, connectionTo.key, 1, '#333333')
+                    new Connection(point.key, connectionTo.key, 1, '#656565')
                 ])
             }
         } else {
@@ -58,21 +58,13 @@ const App = () => {
             if (!isExist) {
                 setConnections([
                     ...connections,
-                    new Connection(from.key, to.key, 1, 'black')
+                    new Connection(from.key, to.key, 1, '#656565')
                 ])
             } else message.warn('Соединение уже существует', 1).then()
         }
     }
 
-    return <div>
-        <Canvas
-            points={points}
-            setPoints={setPoints}
-            connections={connections}
-            setConnections={setConnections}
-            addPoint={addPoint}
-            addConnection={addConnection}
-        />
+    return <div className="flex-container matrix-canvas">
         <Matrix
             points={points}
             setPoints={setPoints}
@@ -81,6 +73,15 @@ const App = () => {
             addPoint={addPoint}
             addConnection={addConnection}
         />
+        <Canvas
+            points={points}
+            setPoints={setPoints}
+            connections={connections}
+            setConnections={setConnections}
+            addPoint={addPoint}
+            addConnection={addConnection}
+        />
+
     </div>
 }
 

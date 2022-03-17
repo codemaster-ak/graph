@@ -1,5 +1,10 @@
 @import '~antd/dist/antd.css';
 
+body {
+    background: #ededed;
+    overflow: hidden;
+}
+
 .flex-container {
     display: flex;
 }
@@ -15,8 +20,96 @@
     align-items: center;
 }
 
+.space-between {
+    display: flex;
+    justify-content: space-between;
+}
+
 .matrix-cell {
     width: 50px;
     height: 50px;
-    border: 1px solid black;
+    border: 1px solid #00000047;
+    text-align: center;
+    line-height: 50px;
 }
+
+.full-height {
+    height: 100%;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+.matrix {
+    background: white;
+    box-shadow: 0 0 5px 5px #0000001a;
+    padding: 16px;
+    border-radius: 5px;
+    width: 600px;
+    height: 600px;
+}
+
+.konvajs-content {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 5px #0000001a;
+}
+
+.controls {
+    background: white;
+    box-shadow: 0 0 5px 5px #0000001a;
+    padding: 16px;
+    border-radius: 5px;
+    display: flex;
+    position: absolute;
+    left: 50%;
+    bottom: 60px;
+    transform: translate(-50%, 0);
+}
+
+.shadow {
+    box-shadow: 0 0 5px 5px #0000001a;
+}
+
+.padding {
+    padding: 16px;
+}
+
+.rounded {
+    border-radius: 15px;
+}
+
+
+
+.ant-btn {
+    width: 210px;
+}
+
+.ant-select {
+    width: 200px;
+}
+
+.divider {
+    margin-right: 30px;
+}
+
+.matrix-canvas {
+    height: 90%;
+    width: 80%;
+    margin: auto;
+}
+
+@media (max-width: 1366px) {
+
+    .matrix-canvas {
+        height: 85%;
+        width: 100%;
+    }
+
+    .controls {
+        bottom: 18px;
+    }
+}
+
+

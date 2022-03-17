@@ -4,7 +4,7 @@ class Point {
     y;
     colour;
 
-    constructor(x, y, key, colour = 'green') {
+    constructor(x, y, key, colour = '#1890ff') {
         this.key = key
         this.x = x
         this.y = y

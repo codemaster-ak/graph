@@ -117,7 +117,7 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
                 x={position.x}
                 y={position.y}
                 points={createConnectionPoints({x: 0, y: 0}, mousePos)}
-                stroke='gray'
+                stroke='#656565'
                 strokeWidth={3}
             />
         )
@@ -147,7 +147,7 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
             onContextMenu={event => handleOnContextMenu(event, point)}
             draggable
             onDragMove={event => handlePointDrag(event, point.key)}
-            perfectDrawEnabled={false}
+            perfectDrawEnabled={true}
         />
     })
 
@@ -166,6 +166,8 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
             points={connectionPoints}
             stroke={connection.colour}
             strokeWidth={3}
+            hitStrokeWidth={5}
+            strokeHitEnabled
             onContextMenu={event => handleOnContextMenu(event, connection)}
         />
     })
@@ -184,10 +186,10 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
         return <Text
             key={point.key}
             x={point.x - 9}
-            y={point.y - 28}
+            y={point.y - 6}
             fontSize={16}
             text={point.key.substring(point.key.length - 2)}
-            fill='red'
+            fill='white'
             perfectDrawEnabled={false}
         />
     })
@@ -206,15 +208,23 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
         } else {
             y = toPoint.y + (fromPoint.y - toPoint.y) / 2
         }
-        return <Text
+        return <>
+            <Circle
+                x={x}
+                y={y}
+                radius={15}
+                fill='white'
+                perfectDrawEnabled={false}
+            />
+            <Text
             key={connection.from + connection.to + Math.random()}
-            x={x}
-            y={y - 15}
-            fontSize={16}
+            x={x-6}
+            y={y-8} //текст над линией
+            fontSize={20}
             text={connection.weight}
-            fill='red'
+            fill='black'
             perfectDrawEnabled={false}
-        />
+        /></>
     })
 
     return <>
@@ -224,15 +234,17 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
             onDblClick={event => addPoint(event, stageRef)}
             onContextMenu={event => onContextMenu(event)}
             ref={stageRef}
+            className="flex-grow-1 flex-center"
         >
             <Layer>
                 {/** порядок borders и pointObjs не менять */}
-                {borders}
-                {pointObjs}
-                {pointTitles}
                 {connectionObjs}
                 {connectionWeights}
                 {connectionPreview}
+                {borders}
+                {pointObjs}
+                {pointTitles}
+
             </Layer>
         </Stage>
         {menuVisible && <DropDownMenu

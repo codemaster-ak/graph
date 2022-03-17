@@ -50,9 +50,9 @@ const Border = ({
         {point && <Circle
             x={point.x}
             y={point.y}
-            stroke='black'
-            strokeWidth={2}
-            radius={SIZE}
+            stroke="#76bdff"
+            strokeWidth={5}
+            radius={SIZE+1}
             perfectDrawEnabled={false}
         />}
         {createAnchors(point)}
