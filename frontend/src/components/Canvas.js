@@ -5,6 +5,7 @@ import {SIZE} from "./consts";
 import DropDownMenu from "./DropDownMenu";
 import getMousePos from "../functions/getMousePos";
 import Connection from "./Connection";
+import getConnectionCoords from "../functions/getConnectionCoords";
 
 const Canvas = ({points, setPoints, connections, setConnections, addPoint, addConnection}) => {
 
@@ -151,25 +152,27 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
         />
     })
 
-    const connectionObjs = connections.map((connection) => {
+    const connectionObjs = connections?.map((connection) => {
         const fromPoint = points.find(point => point.key === connection.from)
         const toPoint = points.find(point => point.key === connection.to)
-        const lineEnd = {
-            x: toPoint.x - fromPoint.x,
-            y: toPoint.y - fromPoint.y
-        }
-        const connectionPoints = createConnectionPoints({x: 0, y: 0}, lineEnd)
-        return <Line
-            key={connection.from + connection.to + Math.random()}
-            x={fromPoint.x}
-            y={fromPoint.y}
-            points={connectionPoints}
-            stroke={connection.colour}
-            strokeWidth={3}
-            hitStrokeWidth={5}
-            strokeHitEnabled
-            onContextMenu={event => handleOnContextMenu(event, connection)}
-        />
+        if (fromPoint && toPoint) {
+            const lineEnd = {
+                x: toPoint.x - fromPoint.x,
+                y: toPoint.y - fromPoint.y
+            }
+            const connectionPoints = createConnectionPoints({x: 0, y: 0}, lineEnd)
+            return <Line
+                key={connection.from + connection.to + Math.random()}
+                x={fromPoint.x}
+                y={fromPoint.y}
+                points={connectionPoints}
+                stroke={connection.colour}
+                strokeWidth={3}
+                hitStrokeWidth={5}
+                // strokeHitEnabled по дефолту true
+                onContextMenu={event => handleOnContextMenu(event, connection)}
+            />
+        } else return null
     })
 
     const borders = selectedPoint
@@ -197,34 +200,35 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
     const connectionWeights = connections.map((connection) => {
         const fromPoint = points.find(point => point.key === connection.from)
         const toPoint = points.find(point => point.key === connection.to)
-        let x, y
-        if (toPoint.x > fromPoint.x) {
-            x = fromPoint.x + (toPoint.x - fromPoint.x) / 2
-        } else {
-            x = toPoint.x + (fromPoint.x - toPoint.x) / 2
-        }
-        if (toPoint.y > fromPoint.y) {
-            y = fromPoint.y + (toPoint.y - fromPoint.y) / 2
-        } else {
-            y = toPoint.y + (fromPoint.y - toPoint.y) / 2
-        }
-        return <>
-            <Circle
+        if (fromPoint && toPoint) {
+            const [x, y] = getConnectionCoords(fromPoint, toPoint)
+            return <Circle
+                key={connection.from + connection.to}
                 x={x}
                 y={y}
                 radius={15}
                 fill='white'
                 perfectDrawEnabled={false}
             />
-            <Text
-            key={connection.from + connection.to + Math.random()}
-            x={x-6}
-            y={y-8} //текст над линией
-            fontSize={20}
-            text={connection.weight}
-            fill='black'
-            perfectDrawEnabled={false}
-        /></>
+        } else return null
+    })
+
+    const connectionWeightTexts = connections.map((connection) => {
+        const fromPoint = points.find(point => point.key === connection.from)
+        const toPoint = points.find(point => point.key === connection.to)
+        if (fromPoint && toPoint) {
+            const [x, y] = getConnectionCoords(fromPoint, toPoint)
+            return <Text
+                key={connection.from + connection.to}
+                x={x - 6}
+                y={y - 8} //текст над линией
+                fontSize={20}
+                text={connection.weight}
+                fill='black'
+                perfectDrawEnabled={false}
+            />
+        } else return null
+
     })
 
     return <>
@@ -234,17 +238,17 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
             onDblClick={event => addPoint(event, stageRef)}
             onContextMenu={event => onContextMenu(event)}
             ref={stageRef}
-            className="flex-grow-1 flex-center"
+            className='flex-grow-1 flex-center'
         >
             <Layer>
                 {/** порядок borders и pointObjs не менять */}
                 {connectionObjs}
                 {connectionWeights}
+                {connectionWeightTexts}
                 {connectionPreview}
                 {borders}
                 {pointObjs}
                 {pointTitles}
-
             </Layer>
         </Stage>
         {menuVisible && <DropDownMenu

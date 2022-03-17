@@ -64,24 +64,25 @@ const App = () => {
         }
     }
 
-    return <div className="flex-container matrix-canvas">
-        <Matrix
-            points={points}
-            setPoints={setPoints}
-            connections={connections}
-            setConnections={setConnections}
-            addPoint={addPoint}
-            addConnection={addConnection}
-        />
-        <Canvas
-            points={points}
-            setPoints={setPoints}
-            connections={connections}
-            setConnections={setConnections}
-            addPoint={addPoint}
-            addConnection={addConnection}
-        />
-
+    return <div className='full-height'>
+        <div className='flex-container matrix-canvas'>
+            <Matrix
+                points={points}
+                setPoints={setPoints}
+                connections={connections}
+                setConnections={setConnections}
+                addPoint={addPoint}
+                addConnection={addConnection}
+            />
+            <Canvas
+                points={points}
+                setPoints={setPoints}
+                connections={connections}
+                setConnections={setConnections}
+                addPoint={addPoint}
+                addConnection={addConnection}
+            />
+        </div>
     </div>
 }
 

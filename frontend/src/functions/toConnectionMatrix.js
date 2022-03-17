@@ -14,7 +14,9 @@ export default function toConnectionMatrix(matrix) {
     matrixConnection[0].shift()
 
     const connections = matrix[0].map(row => {
-        return row.connection
+        let conn = {...row}
+        delete conn.name
+        return row
     })
     connections.shift()
 

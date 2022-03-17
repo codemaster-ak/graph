@@ -50,7 +50,7 @@ const Border = ({
         {point && <Circle
             x={point.x}
             y={point.y}
-            stroke="#76bdff"
+            stroke='#76bdff'
             strokeWidth={5}
             radius={SIZE+1}
             perfectDrawEnabled={false}

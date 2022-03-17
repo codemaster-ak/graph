@@ -33,12 +33,40 @@ app.get('/:fileName', ((req, res) => {
 app.post('/', (req, res) => {
     const content = JSON.stringify(req.body)
     const date = new Date
-    const fileName = String(date.getDate()).padStart(2,"0") +'-'+ String(date.getHours()).padStart(2,"0")+':'+ String(date.getMinutes()).padStart(2,"0") + '.json'
+    const fileName = String(date.getDate()).padStart(2, "0") +
+        '-' + String(date.getHours()).padStart(2, "0") +
+        ':' + String(date.getMinutes()).padStart(2, "0") + '.json'
     fs.open(path.resolve(__dirname, 'files', fileName), 'w', (err) => {
         if (err) throw err
     })
     fs.writeFile(path.resolve(__dirname, 'files', fileName), content, (err) => {
         if (err) throw err
     })
-    res.status(201).json({message: 'Success'})
+    res.status(201).json({title: fileName})
 })
+
+app.put('/', (req, res) => {
+    const content = JSON.stringify(req.body.matrix)
+    const fileName = req.body.fileName
+    fs.readdir(path.resolve(__dirname, 'files'), (e, files) => {
+        if (files.some(file => file === fileName)) {
+            fs.open(path.resolve(__dirname, 'files', fileName), 'w', (err) => {
+                if (err) throw err
+            })
+            fs.writeFile(path.resolve(__dirname, 'files', fileName), content, (err) => {
+                if (err) throw err
+            })
+        } else res.status(404).json({message: 'Not found'})
+    })
+})
+
+app.delete('/:fileName', ((req, res) => {
+    const fileName = req.params.fileName
+    fs.readdir(path.resolve(__dirname, 'files'), (e, files) => {
+        if (files.some(file => file === fileName)) {
+            fs.unlink(path.resolve(__dirname, 'files', fileName), () => {
+                res.status(200).json({message: 'Success'})
+            })
+        } else res.status(404).json({message: 'Not found'})
+    })
+}))
