@@ -59,10 +59,10 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
                 if (point.key === fromPoint) startIndex = index
                 if (point.key === toPoint) finishIndex = index
             })
-            const [distances, paths] = Dijkstra(connectionMatrix, startIndex) // [ 0, 5, 2, 7, 6 ]
+            const [distances, paths] = Dijkstra(connectionMatrix, startIndex)
             message.success(`Расстояние от ${nameFrom} до ${nameTo} = ${distances[finishIndex]}`, 5).then()
             let path = ''
-            if (paths[finishIndex][0]) {
+            if (paths[finishIndex][0] !== undefined) {
                 for (let i = 0; i < paths[finishIndex].length; i++) {
                     let key = points[paths[finishIndex][i]].key
                     path += key.substring(key.length - 2) + ' -> '
