@@ -32,10 +32,10 @@ app.get('/:fileName', ((req, res) => {
 
 app.post('/', (req, res) => {
     const content = JSON.stringify(req.body)
-    const date = new Date
-    const fileName = String(date.getDate()).padStart(2, "0") +
-        '-' + String(date.getHours()).padStart(2, "0") +
-        ':' + String(date.getMinutes()).padStart(2, "0") + '.json'
+    const date = new Date()
+    const fileName = String(date.getDate()).padStart(2, '0') +
+        '-' + String(date.getHours()).padStart(2, '0') +
+        ':' + String(date.getMinutes()).padStart(2, '0') + '.json'
     fs.open(path.resolve(__dirname, 'files', fileName), 'w', (err) => {
         if (err) throw err
     })
