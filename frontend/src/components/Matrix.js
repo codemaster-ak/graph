@@ -2,10 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {message} from "antd";
 import toConnectionMatrix from "../functions/toConnectionMatrix";
 import Dijkstra from "../functions/Dijkstra";
-import Connection from "./Connection";
-import Point from "./Point";
+import Connection from "../classes/Connection";
+import Point from "../classes/Point";
 import Controls from "./Controls";
-import {baseURL} from "./consts";
+import {getAllFileNames, getFileById} from "../functions/http";
+import {highlightConnections, highlightPoints} from "../functions/highlight";
 
 const Matrix = ({points, setPoints, connections, setConnections, addPoint, addConnection}) => {
 
@@ -16,7 +17,7 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
     const [selectedFile, setSelectedFile] = useState(undefined)
 
     useEffect(() => {
-        loadFiles().then()
+        loadFiles()
     }, [])
 
     useEffect(() => {
@@ -69,42 +70,27 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
                 }
                 path = path.substring(0, path.length - 4)
                 message.success(`Путь от ${nameFrom} до ${nameTo}:  ${path}`, 5).then()
+                setPoints(highlightPoints(paths[finishIndex], points))
+                setConnections(highlightConnections(paths[finishIndex], points, connections))
+                //todo откат к изначальному состоянию
+                //todo продумать сохранеие состояния
             } else message.warn('Путь не существует').then()
         } catch (e) {
             message.error(e).then()
         }
     }
 
-    const loadFiles = async () => {
-        const init = {
-            mode: 'cors',
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                protocol: 'http',
-                'Content-Type': 'application/json'
+    const loadFiles = () => {
+        getAllFileNames().then(data => {
+            if (Array.isArray(data)) {
+                setFiles([...data])
             }
-        }
-        await fetch(baseURL, init).then((response) => {
-            if (response.ok) return response.json()
-        }).then(data => {
-            setFiles([...data])
         })
     }
 
-    const download = async () => {
-        const init = {
-            mode: 'cors',
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                protocol: 'http',
-                'Content-Type': 'application/json'
-            }
-        }
-        await fetch(baseURL + '/' + selectedFile, init).then((response) => {
-            if (response.ok) return response.json()
-        }).then(data => {
+    const download = () => {
+        getFileById(selectedFile).then(data => {
+            console.log(data)
             if (Array.isArray(data)) {
                 setIncMatrix([...data])
                 parsePointsAndConnections(data)
@@ -122,14 +108,15 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
             }
         }
         setPoints(pointsTemp.map(point => {
-            return new Point(point.x, point.y, point.key, point.colour)
+            return new Point(point.x, point.y, point.key, point.colour, point.key)
         }))
         setConnections(incMatrix[0].map(connection => {
             return new Connection(
                 connection.from,
                 connection.to,
                 connection.weight,
-                connection.colour
+                connection.colour,
+                connection.key
             )
         }))
     }

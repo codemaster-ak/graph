@@ -1,6 +1,7 @@
 import React from 'react';
 import {Button, Select} from "antd";
-import {baseURL} from "./consts";
+import {BUTTON_WIDTH} from "../consts";
+import {remove, save, update} from "../functions/http";
 
 const {Option} = Select
 
@@ -20,57 +21,20 @@ const Controls = ({
                       download
                   }) => {
 
-    const BUTTON_WIDTH = 310
-
-    const save = async () => {
-        const init = {
-            mode: 'cors',
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                protocol: 'http',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(incMatrix)
-        }
-        await fetch(baseURL, init).then((response) => {
-            if (response.ok) return response.json()
-        }).then((res) => {
+    const createFile = () => {
+        save(incMatrix).then(res => {
             if (!files.some(file => file.title === res.title)) {
                 setFiles([...files, {title: res.title}])
             }
         })
     }
 
-    const updateFile = async () => {
-        const init = {
-            mode: 'cors',
-            method: 'PUT',
-            headers: {
-                Accept: 'application/json',
-                protocol: 'http',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({matrix: incMatrix, fileName: selectedFile})
-        }
-        await fetch(baseURL, init).then((response) => {
-            if (response.ok) return response.json()
-        }).then()
+    const updateFile = () => {
+        update({matrix: incMatrix, fileName: selectedFile}).then()
     }
 
-    const deleteFile = async () => {
-        const init = {
-            mode: 'cors',
-            method: 'DELETE',
-            headers: {
-                Accept: 'application/json',
-                protocol: 'http',
-                'Content-Type': 'application/json'
-            }
-        }
-        await fetch(baseURL + '/' + selectedFile, init).then((response) => {
-            if (response.ok) return response.json()
-        }).then(() => {
+    const deleteFile = () => {
+        remove(selectedFile).then(() => {
             setFiles([...files.filter(file => file.title !== selectedFile)])
             setSelectedFile(undefined)
         })
@@ -150,7 +114,7 @@ const Controls = ({
                 </Button>
                 <Button
                     type='primary'
-                    onClick={selectedFile ? updateFile : save}
+                    onClick={selectedFile ? updateFile : createFile}
                     // icon={<SaveOutlined style={{color: 'white'}}/>}
                     style={{width: 100}}
                 >

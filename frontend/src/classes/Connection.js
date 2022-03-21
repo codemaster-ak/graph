@@ -1,14 +1,10 @@
 class Connection {
-    from;
-    to;
-    weight;
-    colour;
-
-    constructor(from, to, weight, colour = 'black') {
+    constructor(from, to, weight, colour = 'black', key) {
         this.from = from
         this.to = to
         this.weight = weight
         this.colour = colour
+        this.key = typeof key === 'string' ? key : String(key)
     }
 }
 

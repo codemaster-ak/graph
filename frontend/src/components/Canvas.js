@@ -1,11 +1,11 @@
 import React, {useRef, useState} from 'react';
 import {Circle, Layer, Line, Stage, Text} from "react-konva";
 import Border from "./Border";
-import {SIZE} from "./consts";
+import {SIZE} from "../consts";
 import DropDownMenu from "./DropDownMenu";
-import getMousePos from "../functions/getMousePos";
-import Connection from "./Connection";
-import getConnectionCoords from "../functions/getConnectionCoords";
+import Connection from "../classes/Connection";
+import {createConnectionPoints, hasIntersection, getConnectionCoords,getMousePos} from "../functions/canvasFunctions";
+import {logDOM} from "@testing-library/react";
 
 const Canvas = ({points, setPoints, connections, setConnections, addPoint, addConnection}) => {
 
@@ -18,15 +18,6 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
     const [inputVisible, setInputVisible] = useState(false)
     const [menuStyle, setMenuStyle] = useState({})
     const [selectedEntity, setSelectedEntity] = useState(undefined)
-
-    const createConnectionPoints = (source, destination) => {
-        return [source.x, source.y, destination.x, destination.y]
-    }
-
-    const hasIntersection = (position, point) => {
-        const radius = Math.sqrt(Math.pow(position.x - point.x, 2) + Math.pow(position.x - point.x, 2))
-        return SIZE - radius > 0
-    }
 
     const detectConnection = (position, point) => {
         return points.find(p => {
@@ -48,6 +39,7 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
         setPoints(points.filter(point => {
             return point.key !== key
         }))
+        setSelectedPoint(undefined)
     }
 
     const changeWeight = (weight) => {
@@ -77,10 +69,10 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
                 setInputVisible(false)
                 setSelectedEntity(undefined)
             } else {
-                const positionX = stageRef.current.getPointerPosition().x
-                const positionY = stageRef.current.getPointerPosition().y
+                // const positionX = stageRef.current.getPointerPosition().x
+                // const positionY = stageRef.current.getPointerPosition().y
                 setMenuVisible(true)
-                setMenuStyle({position: 'absolute', top: positionY.valueOf(), left: positionX.valueOf()})
+                setMenuStyle({position: 'absolute', top: event.evt.clientY, left: event.evt.clientX})
                 setSelectedEntity(entity)
             }
         }
@@ -123,7 +115,6 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
             />
         )
     }
-
 
     const onContextMenu = (event) => {
         event.evt.preventDefault()
@@ -228,7 +219,6 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
                 perfectDrawEnabled={false}
             />
         } else return null
-
     })
 
     return <>

@@ -6,7 +6,9 @@ const DropDownMenu = ({menuStyle, deleteConnection, changeWeight, inputVisible, 
     const [weight, setWeight] = useState(selectedEntity?.weight)
 
     useEffect(() => {
-        setWeight(selectedEntity?.weight)
+        if (selectedEntity) {
+            setWeight(selectedEntity.weight)
+        }
     }, [selectedEntity])
 
     return <Menu style={menuStyle}>
@@ -17,7 +19,7 @@ const DropDownMenu = ({menuStyle, deleteConnection, changeWeight, inputVisible, 
                 {inputVisible && <>
                     <InputNumber
                         value={weight}
-                        onChange={(value) => setWeight(value)}
+                        onChange={value => setWeight(value)}
                         style={{marginTop: 5, height: 30}}
                     />
                     <Button

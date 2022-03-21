@@ -1,11 +1,6 @@
 class Point {
-    key;
-    x;
-    y;
-    colour;
-
     constructor(x, y, key, colour = '#1890ff') {
-        this.key = key
+        this.key = typeof key === 'string' ? key : String(key)
         this.x = x
         this.y = y
         this.colour = colour

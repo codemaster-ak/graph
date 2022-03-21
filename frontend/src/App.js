@@ -2,10 +2,10 @@ import React, {useState} from 'react';
 import "./App.css";
 import Matrix from "./components/Matrix";
 import Canvas from "./components/Canvas";
-import getMousePos from "./functions/getMousePos";
-import Point from "./components/Point";
-import Connection from "./components/Connection";
+import Point from "./classes/Point";
+import Connection from "./classes/Connection";
 import {message} from "antd";
+import {getMousePos} from "./functions/canvasFunctions";
 
 const App = () => {
 
@@ -22,13 +22,13 @@ const App = () => {
             event.evt.preventDefault()
             const mousePos = getMousePos(event)
             if (points.length < 10) {
-                setPoints([...points, new Point(mousePos.x, mousePos.y, String(new Date().getTime()))])
+                setPoints([...points, new Point(mousePos.x, mousePos.y, new Date().getTime())])
             } else message.warn('Достигнуто максимальное количество вершин - 10', 1).then()
         } else {
             /** 600 - размер Stage */
             const x = Math.round(Math.random() * 600)
             const y = Math.round(Math.random() * 600)
-            setPoints([...points, new Point(x, y, String(new Date().getTime()))])
+            setPoints([...points, new Point(x, y,new Date().getTime())])
         }
     }
 
@@ -45,7 +45,7 @@ const App = () => {
             if (connectionTo && !isExist) {
                 setConnections([
                     ...connections,
-                    new Connection(point.key, connectionTo.key, 1, '#656565')
+                    new Connection(point.key, connectionTo.key, 1, '#656565', new Date().getTime())
                 ])
             }
         } else {
@@ -58,7 +58,7 @@ const App = () => {
             if (!isExist) {
                 setConnections([
                     ...connections,
-                    new Connection(from.key, to.key, 1, '#656565')
+                    new Connection(from.key, to.key, 1, '#656565', new Date().getTime())
                 ])
             } else message.warn('Соединение уже существует', 1).then()
         }

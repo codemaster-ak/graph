@@ -1,7 +1,7 @@
 import React from "react";
 import {Circle} from "react-konva";
 import Anchor from "./Anchor";
-import {SIZE} from "./consts";
+import {SIZE} from "../consts";
 
 const Border = ({
                     point,
@@ -52,7 +52,7 @@ const Border = ({
             y={point.y}
             stroke='#76bdff'
             strokeWidth={5}
-            radius={SIZE+1}
+            radius={SIZE + 1}
             perfectDrawEnabled={false}
         />}
         {createAnchors(point)}

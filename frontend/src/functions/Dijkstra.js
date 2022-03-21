@@ -18,7 +18,7 @@ export default function Dijkstra(matrix, start = 0) {
                 row.forEach((col, j) => {
                     if (col + distances[i] < distances[j]) {
                         distances[j] = col + distances[i]
-                        // debugger
+
                         if ([undefined, j].includes(paths[j].at(-1))) {
                             if (paths[j].at(-1) === undefined && i !== start) {
                                 paths[j] = [...paths[i], j]
