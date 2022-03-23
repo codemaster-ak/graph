@@ -5,7 +5,7 @@ export async function getFileById(file) {
         ...BASE_INIT,
         method: HTTP_METHODS.GET
     }
-    return fetch(BASE_URL + '/' + file, init).then((response) => {
+    return await fetch(BASE_URL + '/' + file, init).then((response) => {
         if (response.ok) return response.json()
     }).then((data) => {
         return data
@@ -17,7 +17,7 @@ export async function getAllFileNames() {
         ...BASE_INIT,
         method: HTTP_METHODS.GET
     }
-    return fetch(BASE_URL, init).then((response) => {
+    return await fetch(BASE_URL, init).then((response) => {
         if (response.ok) return response.json()
     }).then((data) => {
         return data
@@ -30,7 +30,7 @@ export async function save(payload) {
         method: HTTP_METHODS.POST,
         body: JSON.stringify(payload)
     }
-    return fetch(BASE_URL, init).then((response) => {
+    return await fetch(BASE_URL, init).then((response) => {
         if (response.ok) return response.json()
     }).then((data) => {
         return data
@@ -43,7 +43,7 @@ export async function update(payload) {
         method: HTTP_METHODS.PUT,
         body: JSON.stringify(payload)
     }
-    return fetch(BASE_URL, init).then((response) => {
+    return await fetch(BASE_URL, init).then((response) => {
         if (response.ok) return response.json()
     }).then((data) => {
         return data
@@ -55,6 +55,6 @@ export async function remove(file) {
         ...BASE_INIT,
         method: HTTP_METHODS.DELETE
     }
-    return fetch(BASE_URL + '/' + file, init)
+    return await fetch(BASE_URL + '/' + file, init)
 }
 

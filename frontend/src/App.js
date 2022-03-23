@@ -6,6 +6,7 @@ import Point from "./classes/Point";
 import Connection from "./classes/Connection";
 import {message} from "antd";
 import {getMousePos} from "./functions/canvasFunctions";
+import {BASE_CONNECTION_COLOR} from "./consts";
 
 const App = () => {
 
@@ -28,7 +29,7 @@ const App = () => {
             /** 600 - размер Stage */
             const x = Math.round(Math.random() * 600)
             const y = Math.round(Math.random() * 600)
-            setPoints([...points, new Point(x, y,new Date().getTime())])
+            setPoints([...points, new Point(x, y, new Date().getTime())])
         }
     }
 
@@ -45,7 +46,7 @@ const App = () => {
             if (connectionTo && !isExist) {
                 setConnections([
                     ...connections,
-                    new Connection(point.key, connectionTo.key, 1, '#656565', new Date().getTime())
+                    new Connection(point.key, connectionTo.key, 1, BASE_CONNECTION_COLOR, new Date().getTime())
                 ])
             }
         } else {
@@ -58,7 +59,7 @@ const App = () => {
             if (!isExist) {
                 setConnections([
                     ...connections,
-                    new Connection(from.key, to.key, 1, '#656565', new Date().getTime())
+                    new Connection(from.key, to.key, 1, BASE_CONNECTION_COLOR, new Date().getTime())
                 ])
             } else message.warn('Соединение уже существует', 1).then()
         }

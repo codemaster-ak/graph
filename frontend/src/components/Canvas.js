@@ -4,8 +4,7 @@ import Border from "./Border";
 import {SIZE} from "../consts";
 import DropDownMenu from "./DropDownMenu";
 import Connection from "../classes/Connection";
-import {createConnectionPoints, hasIntersection, getConnectionCoords,getMousePos} from "../functions/canvasFunctions";
-import {logDOM} from "@testing-library/react";
+import {createConnectionPoints, getConnectionCoords, getMousePos, hasIntersection} from "../functions/canvasFunctions";
 
 const Canvas = ({points, setPoints, connections, setConnections, addPoint, addConnection}) => {
 

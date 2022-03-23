@@ -1,9 +1,10 @@
 import Point from "../classes/Point";
 import Connection from "../classes/Connection";
+import {HIGHLIGHT_CONNECTION_COLOR, HIGHLIGHT_POINT_COLOR} from "../consts";
 
 export function highlightPoints(path, points) {
     return points.map((point, index) => {
-        if (path.includes(index)) return new Point(point.x, point.y, point.key, 'red')
+        if (path.includes(index)) return new Point(point.x, point.y, point.key, HIGHLIGHT_POINT_COLOR)
         return point
     })
 }
@@ -16,7 +17,7 @@ export function highlightConnections(path, points, connections) {
         for (let j = 0; j < connectionsCopy.length; j++) {
             if ((connectionsCopy[j].from === fromPoint.key && connectionsCopy[j].to === toPoint.key) ||
                 (connectionsCopy[j].from === toPoint.key && connectionsCopy[j].to === fromPoint.key)) {
-                connectionsCopy[j].colour = 'red'
+                connectionsCopy[j].colour = HIGHLIGHT_CONNECTION_COLOR
             }
         }
     }

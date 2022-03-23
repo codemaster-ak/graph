@@ -6,7 +6,7 @@ import Connection from "../classes/Connection";
 import Point from "../classes/Point";
 import Controls from "./Controls";
 import {getAllFileNames, getFileById} from "../functions/http";
-import {highlightConnections, highlightPoints} from "../functions/highlight";
+import Highlighter from "./Highlighter";
 
 const Matrix = ({points, setPoints, connections, setConnections, addPoint, addConnection}) => {
 
@@ -15,6 +15,8 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
     const [toPoint, setToPoint] = useState(undefined)
     const [files, setFiles] = useState([])
     const [selectedFile, setSelectedFile] = useState(undefined)
+    const [path, setPath] = useState([])
+    const [distance, setDistance] = useState(undefined)
 
     useEffect(() => {
         loadFiles()
@@ -54,27 +56,28 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
         })
         try {
             let startIndex = 0, finishIndex = 0
-            const nameFrom = fromPoint.substring(fromPoint.length - 2)
-            const nameTo = toPoint.substring(toPoint.length - 2)
+            // const nameFrom = fromPoint.substring(fromPoint.length - 2)
+            // const nameTo = toPoint.substring(toPoint.length - 2)
             points.forEach((point, index) => {
                 if (point.key === fromPoint) startIndex = index
                 if (point.key === toPoint) finishIndex = index
             })
             const [distances, paths] = Dijkstra(connectionMatrix, startIndex)
-            message.success(`Расстояние от ${nameFrom} до ${nameTo} = ${distances[finishIndex]}`, 5).then()
-            let path = ''
+            // message.success(`Расстояние от ${nameFrom} до ${nameTo} = ${distances[finishIndex]}`, 1).then()
+            // let path = ''
             if (paths[finishIndex][0] !== undefined) {
-                for (let i = 0; i < paths[finishIndex].length; i++) {
-                    let key = points[paths[finishIndex][i]].key
-                    path += key.substring(key.length - 2) + ' -> '
-                }
-                path = path.substring(0, path.length - 4)
-                message.success(`Путь от ${nameFrom} до ${nameTo}:  ${path}`, 5).then()
-                setPoints(highlightPoints(paths[finishIndex], points))
-                setConnections(highlightConnections(paths[finishIndex], points, connections))
-                //todo откат к изначальному состоянию
-                //todo продумать сохранеие состояния
-            } else message.warn('Путь не существует').then()
+                setPath(paths[finishIndex])
+                setDistance(distances[finishIndex])
+                // for (let i = 0; i < paths[finishIndex].length; i++) {
+                //     let key = points[paths[finishIndex][i]].key
+                //     path += key.substring(key.length - 2) + ' -> '
+                // }
+                // path = path.substring(0, path.length - 4)
+                // message.success(`Путь от ${nameFrom} до ${nameTo}:  ${path}`, 1).then()
+            } else {
+                setDistance(Infinity)
+                // message.warn('Путь не существует').then()
+            }
         } catch (e) {
             message.error(e).then()
         }
@@ -121,7 +124,20 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
         }))
     }
 
+    const clear = () => {
+        setConnections([])
+        setPoints([])
+    }
+
     return <div className='flex-grow-1 flex-center'>
+        <Highlighter
+            points={points}
+            setPoints={setPoints}
+            connections={connections}
+            setConnections={setConnections}
+            path={path}
+            distance={distance}
+        />
         <div className='matrix'>
             <div className='flex-column' style={{height: 570, overflowX: 'auto'}}>
                 {incMatrix.map((row, indexRow) => {
@@ -160,6 +176,7 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
             setToPoint={setToPoint}
             computePath={computePath}
             download={download}
+            clear={clear}
         />
     </div>
 }

@@ -18,7 +18,8 @@ const Controls = ({
                       addConnection,
                       files,
                       setFiles,
-                      download
+                      download,
+                      clear
                   }) => {
 
     const createFile = () => {
@@ -41,7 +42,7 @@ const Controls = ({
     }
 
     return <div className='controls'>
-        <div className='flex-column divider' style={{width: BUTTON_WIDTH}}>
+        <div className='flex-column margin-right-lg' style={{width: BUTTON_WIDTH}}>
             <div className='space-between'>
                 <Select
                     placeholder='От'
@@ -65,16 +66,25 @@ const Controls = ({
                     })}
                 </Select>
             </div>
-            <Button
-                type='primary'
-                onClick={computePath}
-                disabled={!fromPoint || !toPoint || fromPoint === toPoint}
-                style={{marginTop: 10, width: BUTTON_WIDTH}}
-            >
-                Найти кратчайший путь
-            </Button>
+            <div>
+                <Button
+                    type='primary'
+                    onClick={computePath}
+                    disabled={!fromPoint || !toPoint || fromPoint === toPoint}
+                    style={{marginTop: 10, marginRight: 10, width: BUTTON_WIDTH / 2 - 5}}
+                >
+                    Найти кратчайший путь
+                </Button>
+                <Button
+                    type='primary'
+                    onClick={clear}
+                    style={{marginTop: 10, width: BUTTON_WIDTH / 2 - 5}}
+                >
+                    Очистить
+                </Button>
+            </div>
         </div>
-        <div className='flex-column divider'>
+        <div className='flex-column margin-right-lg'>
             <Button
                 type='primary'
                 onClick={event => addPoint(event)}

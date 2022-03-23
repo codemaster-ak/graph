@@ -41,6 +41,14 @@ body {
     flex-grow: 1;
 }
 
+.no-padding {
+    padding: 0;
+}
+
+.no-margin {
+    margin: 0;
+}
+
 .matrix {
     background: white;
     box-shadow: 0 0 5px 5px #0000001a;
@@ -68,14 +76,16 @@ body {
     transform: translate(-50%, 0);
 }
 
-.alert{
+.highlighter {
+    background: white;
+    box-shadow: 0 0 5px 5px #0000001a;
     padding: 16px;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
     position: absolute;
     left: 50%;
-    top: 20px;
+    top: 10px;
     transform: translate(-50%, 0);
 }
 
@@ -92,7 +102,6 @@ body {
 }
 
 
-
 .ant-btn {
     width: 210px;
 }
@@ -101,7 +110,7 @@ body {
     width: 200px;
 }
 
-.divider {
+.margin-right-lg {
     margin-right: 30px;
 }
 
