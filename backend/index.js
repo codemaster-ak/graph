@@ -1,11 +1,12 @@
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
-const PORT = 4000
+const {HOST, PORT} = require("./consts");
+const {toBaseColours} = require("./functions/toBaseColours");
 
 const app = express()
 
-app.listen(PORT, () => console.log(`Server running on http://127.0.0.1:${PORT}/`))
+app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}/`))
 app.use(express.json())
 
 app.get('', ((req, res) => {
@@ -31,22 +32,40 @@ app.get('/:fileName', ((req, res) => {
 }))
 
 app.post('/', (req, res) => {
-    const content = JSON.stringify(req.body)
+    let matrix = JSON.parse(JSON.stringify(req.body))
     const date = new Date()
     const fileName = String(date.getDate()).padStart(2, '0') +
         '-' + String(date.getHours()).padStart(2, '0') +
         ':' + String(date.getMinutes()).padStart(2, '0') + '.json'
-    fs.open(path.resolve(__dirname, 'files', fileName), 'w', (err) => {
-        if (err) throw err
+    matrix = toBaseColours(matrix)
+    const content = JSON.stringify(matrix)
+    fs.stat(path.resolve(__dirname, 'files'), (err, stats) => {
+        if (stats?.isDirectory()) {
+            fs.open(path.resolve(__dirname, 'files', fileName), 'w', (err) => {
+                if (err) throw err
+            })
+            fs.writeFile(path.resolve(__dirname, 'files', fileName), content, (err) => {
+                if (err) throw err
+            })
+            res.status(201).json({title: fileName})
+        } else {
+            fs.mkdir(path.resolve(__dirname, 'files'), (err) => {
+                if (err) throw err
+                fs.open(path.resolve(__dirname, 'files', fileName), 'w', (err) => {
+                    if (err) throw err
+                })
+                fs.writeFile(path.resolve(__dirname, 'files', fileName), content, (err) => {
+                    if (err) throw err
+                })
+            })
+        }
     })
-    fs.writeFile(path.resolve(__dirname, 'files', fileName), content, (err) => {
-        if (err) throw err
-    })
-    res.status(201).json({title: fileName})
 })
 
 app.put('/', (req, res) => {
-    const content = JSON.stringify(req.body.matrix)
+    let matrix = JSON.parse(JSON.stringify(req.body))
+    matrix = toBaseColours(matrix)
+    const content = JSON.stringify(matrix)
     const fileName = req.body.fileName
     fs.readdir(path.resolve(__dirname, 'files'), (e, files) => {
         if (files.some(file => file === fileName)) {

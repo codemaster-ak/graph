@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {InputNumber, message} from "antd";
+import {message} from "antd";
 import toConnectionMatrix from "../functions/toConnectionMatrix";
 import Dijkstra from "../functions/Dijkstra";
 import Connection from "../classes/Connection";
@@ -94,7 +94,6 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
 
     const download = () => {
         getFileById(selectedFile).then(data => {
-            console.log(data)
             if (Array.isArray(data)) {
                 setIncMatrix([...data])
                 parsePointsAndConnections(data)
@@ -130,6 +129,16 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
         setPoints([])
     }
 
+    const changeWeight = (value, row, col) => {
+        if (value > 0) {
+            setConnections(connections.map((connection, index) => {
+                if (index + 1 === col) {
+                    return new Connection(connection.from, connection.to, value, connection.colour, connection.key)
+                } else return connection
+            }))
+        }
+    }
+
     return <div className='flex-grow-1 flex-center'>
         <Highlighter
             points={points}
@@ -145,31 +154,19 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
                     return <div key={String(indexRow)} className='flex-container no-margin no-padding'>
                         {row.map((colValue, indexCol) => {
                             return <MatrixCell
+                                key={String(indexRow) + indexCol}
                                 col={indexCol}
                                 row={indexRow}
                                 colValue={colValue}
                                 connections={connections}
                                 setConnections={setConnections}
                                 incMatrix={incMatrix}
+                                changeWeight={changeWeight}
                             />
                         })}
-                        {/*    className='matrix-cell'*/}
-                        {/*    key={indexRow + indexCol + ''}*/}
-                        {/*>*/}
-                        {/*    {indexCol === 0*/}
-                        {/*        ? indexRow > 0*/}
-                        {/*            ? colValue.name*/}
-                        {/*            : ''*/}
-                        {/*        : indexRow > 0*/}
-                        {/*            ? colValue*/}
-                        {/*            : colValue.name}*/}
-                        {/*</div>*/}
-                        {/*})}*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
                     </div>
                 })}
-        </div>
+            </div>
         </div>
         <Controls
             addConnection={addConnection}
