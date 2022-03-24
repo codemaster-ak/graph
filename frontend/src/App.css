@@ -26,11 +26,10 @@ body {
 }
 
 .matrix-cell {
-    width: 50px;
-    height: 50px;
-    border: 1px solid #00000047;
+    height: 42px;
+    width: 60px;
+    border: 1px solid #000000;
     text-align: center;
-    line-height: 50px;
 }
 
 .full-height {

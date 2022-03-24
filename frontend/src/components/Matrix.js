@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {message} from "antd";
+import {InputNumber, message} from "antd";
 import toConnectionMatrix from "../functions/toConnectionMatrix";
 import Dijkstra from "../functions/Dijkstra";
 import Connection from "../classes/Connection";
@@ -141,21 +141,36 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
         <div className='matrix'>
             <div className='flex-column' style={{height: 570, overflowX: 'auto'}}>
                 {incMatrix.map((row, indexRow) => {
-                    return <div key={indexRow + ''} className='flex-container'>
+                    return <div key={String(indexRow)} className='flex-container no-margin no-padding'>
                         <div className='flex-container'>
                             {row.map((colValue, indexCol) => {
-                                return <div
-                                    className='matrix-cell'
-                                    key={indexRow + indexCol + ''}
-                                >
-                                    {indexCol === 0
-                                        ? indexRow > 0
-                                            ? colValue.name
-                                            : ''
-                                        : indexRow > 0
-                                            ? colValue
-                                            : colValue.name}
-                                </div>
+                                return indexCol === 0
+                                    ? <div className='matrix-cell' key={indexRow + indexCol + ''}>
+                                        {indexRow > 0 ? colValue.name : ''}
+                                    </div>
+                                    : indexRow === 0
+                                        ? <div className='matrix-cell' key={indexRow + indexCol + ''}>
+                                            {colValue.name}
+                                        </div>
+                                        : <InputNumber
+                                            size='large'
+                                            min={0}
+                                            max={99}
+                                            style={{width: 60, border: '1px solid #000000'}}
+                                            key={String(indexRow) + indexCol}
+                                        />
+                                // return <div
+                                //     className='matrix-cell'
+                                //     key={indexRow + indexCol + ''}
+                                // >
+                                //     {indexCol === 0
+                                //         ? indexRow > 0
+                                //             ? colValue.name
+                                //             : ''
+                                //         : indexRow > 0
+                                //             ? colValue
+                                //             : colValue.name}
+                                // </div>
                             })}
                         </div>
                     </div>

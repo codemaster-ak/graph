@@ -42,7 +42,7 @@ const Controls = ({
     }
 
     return <div className='controls'>
-        <div className='flex-column margin-right-lg' style={{width: BUTTON_WIDTH}}>
+        <div className='flex-column margin-right-lg'>
             <div className='space-between'>
                 <Select
                     placeholder='От'
@@ -66,12 +66,12 @@ const Controls = ({
                     })}
                 </Select>
             </div>
-            <div>
+            <div className='flex-container'>
                 <Button
                     type='primary'
                     onClick={computePath}
                     disabled={!fromPoint || !toPoint || fromPoint === toPoint}
-                    style={{marginTop: 10, marginRight: 10, width: BUTTON_WIDTH / 2 - 5}}
+                    style={{marginTop: 10, marginRight: 10}}
                 >
                     Найти кратчайший путь
                 </Button>
