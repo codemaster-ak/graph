@@ -7,6 +7,7 @@ import Point from "../classes/Point";
 import Controls from "./Controls";
 import {getAllFileNames, getFileById} from "../functions/http";
 import Highlighter from "./Highlighter";
+import MatrixCell from "./MatrixCell";
 
 const Matrix = ({points, setPoints, connections, setConnections, addPoint, addConnection}) => {
 
@@ -142,40 +143,33 @@ const Matrix = ({points, setPoints, connections, setConnections, addPoint, addCo
             <div className='flex-column' style={{height: 570, overflowX: 'auto'}}>
                 {incMatrix.map((row, indexRow) => {
                     return <div key={String(indexRow)} className='flex-container no-margin no-padding'>
-                        <div className='flex-container'>
-                            {row.map((colValue, indexCol) => {
-                                return indexCol === 0
-                                    ? <div className='matrix-cell' key={indexRow + indexCol + ''}>
-                                        {indexRow > 0 ? colValue.name : ''}
-                                    </div>
-                                    : indexRow === 0
-                                        ? <div className='matrix-cell' key={indexRow + indexCol + ''}>
-                                            {colValue.name}
-                                        </div>
-                                        : <InputNumber
-                                            size='large'
-                                            min={0}
-                                            max={99}
-                                            style={{width: 60, border: '1px solid #000000'}}
-                                            key={String(indexRow) + indexCol}
-                                        />
-                                // return <div
-                                //     className='matrix-cell'
-                                //     key={indexRow + indexCol + ''}
-                                // >
-                                //     {indexCol === 0
-                                //         ? indexRow > 0
-                                //             ? colValue.name
-                                //             : ''
-                                //         : indexRow > 0
-                                //             ? colValue
-                                //             : colValue.name}
-                                // </div>
-                            })}
-                        </div>
+                        {row.map((colValue, indexCol) => {
+                            return <MatrixCell
+                                col={indexCol}
+                                row={indexRow}
+                                colValue={colValue}
+                                connections={connections}
+                                setConnections={setConnections}
+                                incMatrix={incMatrix}
+                            />
+                        })}
+                        {/*    className='matrix-cell'*/}
+                        {/*    key={indexRow + indexCol + ''}*/}
+                        {/*>*/}
+                        {/*    {indexCol === 0*/}
+                        {/*        ? indexRow > 0*/}
+                        {/*            ? colValue.name*/}
+                        {/*            : ''*/}
+                        {/*        : indexRow > 0*/}
+                        {/*            ? colValue*/}
+                        {/*            : colValue.name}*/}
+                        {/*</div>*/}
+                        {/*})}*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
                     </div>
                 })}
-            </div>
+        </div>
         </div>
         <Controls
             addConnection={addConnection}
