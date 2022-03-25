@@ -1,13 +1,16 @@
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
-const {HOST, PORT} = require("./consts");
-const {toBaseColours} = require("./functions/toBaseColours");
+const cors = require('cors')
+const {HOST, PORT} = require("./consts")
+const {toBaseColours} = require("./functions/toBaseColours")
 
 const app = express()
 
-app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}/`))
+app.use(cors())
 app.use(express.json())
+
+app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}/`))
 
 app.get('', ((req, res) => {
     fs.readdir(path.resolve(__dirname, 'files'), (err, files) => {
