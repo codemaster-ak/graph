@@ -1,34 +1,34 @@
 import React, {useRef, useState} from 'react';
 import {Circle, Layer, Line, Stage, Text} from "react-konva";
 import Border from "./Border";
-import {SIZE} from "../consts";
-import DropDownMenu from "./DropDownMenu";
+import {SIZE, STAGE_SIZE} from "../consts";
 import Connection from "../classes/Connection";
 import {createConnectionPoints, getConnectionCoords, getMousePos, hasIntersection} from "../functions/canvasFunctions";
 
-const Canvas = ({points, setPoints, connections, setConnections, addPoint, addConnection}) => {
+const Canvas = ({
+                    points,
+                    setPoints,
+                    connections,
+                    setConnections,
+                    addPoint,
+                    addConnection,
+                    menuVisible,
+                    setMenuVisible,
+                    setInputVisible,
+                    setMenuStyle,
+                    selectedEntity,
+                    setSelectedEntity
+                }) => {
 
     const stageRef = useRef(undefined)
 
     const [selectedPoint, setSelectedPoint] = useState(undefined)
     const [connectionPreview, setConnectionPreview] = useState(null)
 
-    const [menuVisible, setMenuVisible] = useState(false)
-    const [inputVisible, setInputVisible] = useState(false)
-    const [menuStyle, setMenuStyle] = useState({})
-    const [selectedEntity, setSelectedEntity] = useState(undefined)
-
     const detectConnection = (position, point) => {
         return points.find(p => {
             return p.key !== point.key && hasIntersection(position, p)
         })
-    }
-
-    const deleteConnection = () => {
-        setConnections(connections.filter(connection => {
-            return connection.from !== selectedEntity.from || connection.to !== selectedEntity.to
-        }))
-        setMenuVisible(false)
     }
 
     const deletePoint = (key) => {
@@ -39,17 +39,6 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
             return point.key !== key
         }))
         setSelectedPoint(undefined)
-    }
-
-    const changeWeight = (weight) => {
-        setConnections(connections.map(connection => {
-            if (connection.from === selectedEntity.from && connection.to === selectedEntity.to) {
-                connection.weight = weight
-            }
-            return connection
-        }))
-        setInputVisible(false)
-        setMenuVisible(false)
     }
 
     const handleOnClick = (point) => {
@@ -159,7 +148,6 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
                 stroke={connection.colour}
                 strokeWidth={3}
                 hitStrokeWidth={5}
-                // strokeHitEnabled по дефолту true
                 onContextMenu={event => handleOnContextMenu(event, connection)}
             />
         } else return null
@@ -211,7 +199,7 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
             return <Text
                 key={connection.from + connection.to}
                 x={x - 6}
-                y={y - 8} //текст над линией
+                y={y - 8}
                 fontSize={20}
                 text={connection.weight}
                 fill='black'
@@ -220,35 +208,25 @@ const Canvas = ({points, setPoints, connections, setConnections, addPoint, addCo
         } else return null
     })
 
-    return <>
-        <Stage
-            width={600}
-            height={600}
-            onDblClick={event => addPoint(event, stageRef)}
-            onContextMenu={event => onContextMenu(event)}
-            ref={stageRef}
-            className='flex-grow-1 flex-center'
-        >
-            <Layer>
-                {/** порядок borders и pointObjs не менять */}
-                {connectionObjs}
-                {connectionWeights}
-                {connectionWeightTexts}
-                {connectionPreview}
-                {borders}
-                {pointObjs}
-                {pointTitles}
-            </Layer>
-        </Stage>
-        {menuVisible && <DropDownMenu
-            deleteConnection={deleteConnection}
-            changeWeight={changeWeight}
-            menuStyle={menuStyle}
-            inputVisible={inputVisible}
-            setInputVisible={setInputVisible}
-            selectedEntity={selectedEntity}
-        />}
-    </>
+    return <Stage
+        width={STAGE_SIZE}
+        height={STAGE_SIZE}
+        onDblClick={event => addPoint(event, stageRef)}
+        onContextMenu={event => onContextMenu(event)}
+        ref={stageRef}
+        className='flex-grow-1 flex-center'
+    >
+        <Layer>
+            {/** порядок borders и pointObjs не менять */}
+            {connectionObjs}
+            {connectionWeights}
+            {connectionWeightTexts}
+            {connectionPreview}
+            {borders}
+            {pointObjs}
+            {pointTitles}
+        </Layer>
+    </Stage>
 }
 
 export default Canvas;

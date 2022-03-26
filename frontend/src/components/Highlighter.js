@@ -1,14 +1,13 @@
 import React, {useState} from 'react';
-import {Button, message} from "antd";
+import {Button} from "antd";
 import {highlightConnections, highlightPoints} from "../functions/highlight";
-import {BASE_CONNECTION_COLOR, BUTTON_WIDTH, HIGHLIGHT_CONNECTION_COLOR, HIGHLIGHT_POINT_COLOR} from "../consts";
+import {BASE_CONNECTION_COLOR, HIGHLIGHT_CONNECTION_COLOR, HIGHLIGHT_POINT_COLOR} from "../consts";
 import Point from "../classes/Point";
 import Connection from "../classes/Connection";
 
 const Highlighter = ({points, setPoints, connections, setConnections, path, distance}) => {
 
     const [highlightToggle, setHighlightToggle] = useState(false)
-    // const [savedGraph, setSavedGraph] = useState(undefined)
 
     const toggleHighlight = () => {
         if (highlightToggle) {
@@ -45,7 +44,7 @@ const Highlighter = ({points, setPoints, connections, setConnections, path, dist
         return value.substring(0, value.length - 4)
     }
 
-    return <div className='highlighter'>
+    return <div className='highlighter' style={{marginBottom: '5%'}}>
         <div className='flex-column'>
             <div className='flex-center'>
                 <Button

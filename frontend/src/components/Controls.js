@@ -1,26 +1,53 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Select} from "antd";
 import {BUTTON_WIDTH} from "../consts";
-import {remove, save, update} from "../functions/http";
+import {getAllFileNames, getFileById, remove, save, update} from "../functions/http";
+import Point from "../classes/Point";
+import Connection from "../classes/Connection";
 
 const {Option} = Select
 
 const Controls = ({
+                      setPoints,
+                      setConnections,
                       fromPoint,
                       setFromPoint,
                       toPoint,
                       setToPoint,
                       incMatrix,
+                      setIncMatrix,
                       computePath,
                       addPoint,
-                      selectedFile,
-                      setSelectedFile,
                       addConnection,
-                      files,
-                      setFiles,
-                      download,
-                      clear
                   }) => {
+
+    const [files, setFiles] = useState([])
+    const [selectedFile, setSelectedFile] = useState(undefined)
+
+    // useEffect(() => {
+    //     options().then()
+    // }, [])
+
+    useEffect(() => {
+        loadFiles()
+    }, [])
+
+    const loadFiles = () => {
+        getAllFileNames().then(data => {
+            if (Array.isArray(data)) {
+                setFiles([...data])
+            }
+        })
+    }
+
+    const download = () => {
+        getFileById(selectedFile).then(data => {
+            if (Array.isArray(data)) {
+                setIncMatrix([...data])
+                parsePointsAndConnections(data)
+            }
+        })
+    }
 
     const createFile = () => {
         save(incMatrix).then(res => {
@@ -39,6 +66,34 @@ const Controls = ({
             setFiles([...files.filter(file => file.title !== selectedFile)])
             setSelectedFile(undefined)
         })
+    }
+
+    const parsePointsAndConnections = (matrix) => {
+        matrix[0].shift()
+        let pointsTemp = []
+        for (let i = 0; i < matrix.length; i++) {
+            if (i > 0) {
+                delete matrix[i][0].name
+                pointsTemp.push(matrix[i][0])
+            }
+        }
+        setPoints(pointsTemp.map(point => {
+            return new Point(point.x, point.y, point.key, point.colour, point.key)
+        }))
+        setConnections(matrix[0].map(connection => {
+            return new Connection(
+                connection.from,
+                connection.to,
+                connection.weight,
+                connection.colour,
+                connection.key
+            )
+        }))
+    }
+
+    const clear = () => {
+        setConnections([])
+        setPoints([])
     }
 
     return <div className='controls'>
@@ -117,7 +172,6 @@ const Controls = ({
                 <Button
                     type='primary'
                     onClick={download}
-                    // icon={<DownloadOutlined style={{color: 'white'}}/>}
                     style={{width: 100}}
                 >
                     Загрузить
@@ -125,7 +179,6 @@ const Controls = ({
                 <Button
                     type='primary'
                     onClick={selectedFile ? updateFile : createFile}
-                    // icon={<SaveOutlined style={{color: 'white'}}/>}
                     style={{width: 100}}
                 >
                     Сохранить
@@ -133,7 +186,6 @@ const Controls = ({
                 <Button
                     type='primary'
                     onClick={deleteFile}
-                    // icon={<DeleteOutlined style={{color: 'white'}}/>}
                     style={{width: 100}}
                     disabled={!selectedFile}
                 >

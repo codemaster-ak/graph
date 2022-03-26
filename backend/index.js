@@ -12,18 +12,25 @@ app.use(express.json())
 
 app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}/`))
 
-app.get('', ((req, res) => {
+app.get('', (req, res) => {
     fs.readdir(path.resolve(__dirname, 'files'), (err, files) => {
-        const response = files.map(file => {
-            return {
-                title: file
-            }
-        })
-        res.status(200).json(response)
+        if (err) {
+            fs.mkdir(path.resolve(__dirname, 'files'), (err) => {
+                if (err) throw err
+                else res.status(200).json([])
+            })
+        } else {
+            const response = files.map(file => {
+                return {
+                    title: file
+                }
+            })
+            res.status(200).json(response)
+        }
     })
-}))
+})
 
-app.get('/:fileName', ((req, res) => {
+app.get('/:fileName', (req, res) => {
     const fileName = req.params.fileName
     fs.readdir(path.resolve(__dirname, 'files'), (e, files) => {
         if (files.some(file => file === fileName)) {
@@ -32,7 +39,7 @@ app.get('/:fileName', ((req, res) => {
             })
         } else res.status(404).json({message: 'Not found'})
     })
-}))
+})
 
 app.post('/', (req, res) => {
     let matrix = JSON.parse(JSON.stringify(req.body))
@@ -82,7 +89,7 @@ app.put('/', (req, res) => {
     })
 })
 
-app.delete('/:fileName', ((req, res) => {
+app.delete('/:fileName', (req, res) => {
     const fileName = req.params.fileName
     fs.readdir(path.resolve(__dirname, 'files'), (e, files) => {
         if (files.some(file => file === fileName)) {
@@ -91,4 +98,8 @@ app.delete('/:fileName', ((req, res) => {
             })
         } else res.status(404).json({message: 'Not found'})
     })
-}))
+})
+
+app.options('/', (req, res) => {
+    console.log(res)
+})

@@ -20,10 +20,22 @@ body {
     align-items: center;
 }
 
+.flex-column-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .space-between {
     display: flex;
     justify-content: space-between;
 }
+
+.space-around {
+    display: flex;
+    justify-content: space-around;
+}
+
 
 .matrix-cell {
     height: 42px;
@@ -53,8 +65,8 @@ body {
     box-shadow: 0 0 5px 5px #0000001a;
     padding: 16px;
     border-radius: 5px;
-    width: 600px;
-    height: 600px;
+    width: 500px;
+    height: 500px;
 }
 
 .konvajs-content {
@@ -69,10 +81,9 @@ body {
     padding: 16px;
     border-radius: 5px;
     display: flex;
-    position: absolute;
-    left: 50%;
-    bottom: 60px;
-    transform: translate(-50%, 0);
+    justify-content: center;
+    margin: 0 10%;
+    /*transform: translate(-50%, 0);*/
 }
 
 .highlighter {
@@ -82,10 +93,8 @@ body {
     border-radius: 5px;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    left: 50%;
-    top: 10px;
-    transform: translate(-50%, 0);
+    margin: 0 35%;
+    /*transform: translate(-50%, 0);*/
 }
 
 .shadow {
@@ -114,8 +123,8 @@ body {
 }
 
 .matrix-canvas {
-    height: 90%;
-    width: 80%;
+    /*height: 90%;*/
+    /*width: 80%;*/
     margin: auto;
 }
 

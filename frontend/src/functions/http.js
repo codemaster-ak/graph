@@ -58,3 +58,10 @@ export async function remove(file) {
     return await fetch(BASE_URL + '/' + file, init)
 }
 
+export async function options() {
+    const init = {
+        ...BASE_INIT,
+        method: HTTP_METHODS.OPTIONS
+    }
+    return await fetch(BASE_URL + '/', init)
+}

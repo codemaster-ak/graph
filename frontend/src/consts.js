@@ -1,4 +1,5 @@
 export const SIZE = 20
+export const STAGE_SIZE = 500
 
 export const BUTTON_WIDTH = 310
 
@@ -13,7 +14,8 @@ export const HTTP_METHODS = {
     GET: 'GET',
     POST: 'POST',
     PUT: 'PUT',
-    DELETE: 'DELETE'
+    DELETE: 'DELETE',
+    OPTIONS: 'OPTIONS'
 }
 
 export const BASE_INIT = {
