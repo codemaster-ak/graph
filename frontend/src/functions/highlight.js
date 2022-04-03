@@ -1,6 +1,6 @@
-import Point from "../classes/Point";
-import Connection from "../classes/Connection";
-import {HIGHLIGHT_CONNECTION_COLOR, HIGHLIGHT_POINT_COLOR} from "../consts";
+import Point from '../classes/Point';
+import Connection from '../classes/Connection';
+import {HIGHLIGHT_CONNECTION_COLOR, HIGHLIGHT_POINT_COLOR} from '../consts';
 
 export function highlightPoints(path, points) {
     return points.map((point, index) => {
@@ -26,6 +26,6 @@ export function highlightConnections(path, points, connections) {
         connection.to,
         connection.weight,
         connection.colour,
-        connection.key
+        connection.key,
     ))
 }

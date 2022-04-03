@@ -1,23 +1,25 @@
 import React, {useState} from 'react';
-import "./App.css";
-import Matrix from "./components/Matrix";
-import Canvas from "./components/Canvas";
-import Point from "./classes/Point";
-import Connection from "./classes/Connection";
-import {message} from "antd";
-import {getMousePos} from "./functions/canvasFunctions";
-import {BASE_CONNECTION_COLOR, STAGE_SIZE} from "./consts";
-import Controls from "./components/Controls";
-import Highlighter from "./components/Highlighter";
-import toConnectionMatrix from "./functions/toConnectionMatrix";
-import Dijkstra from "./functions/Dijkstra";
-import DropDownMenu from "./components/DropDownMenu";
+import './App.css';
+import Matrix from './components/Matrix';
+import Canvas from './components/Canvas';
+import Point from './classes/Point';
+import Connection from './classes/Connection';
+import {Button, message} from 'antd';
+import {getMousePos} from './functions/canvasFunctions';
+import {BASE_CONNECTION_COLOR, STAGE_SIZE} from './consts';
+import Controls from './components/Controls';
+import Highlighter from './components/Highlighter';
+import toConnectionMatrix from './functions/toConnectionMatrix';
+import DropDownMenu from './components/DropDownMenu';
+import Graph from './classes/Graph';
+import ResultTableModal from './components/ResultTableModal';
 
 const App = () => {
 
     /**
      * Матрица смежности
-     * Значение - это вес ребра между вершиной и вершиной, 0 означает отсутствие самоконтроля, Infinity означает отсутствие ребра
+     * Значение - это вес ребра между вершиной и вершиной, 0 означает отсутствие самоконтроля, Infinity означает
+     * отсутствие ребра
      * */
 
     const [points, setPoints] = useState([])
@@ -32,6 +34,9 @@ const App = () => {
     const [inputVisible, setInputVisible] = useState(false)
     const [menuStyle, setMenuStyle] = useState({})
     const [selectedEntity, setSelectedEntity] = useState(undefined)
+
+    const [resultModalVisible, setResultModalVisible] = useState(false)
+    const [pathList, setPathList] = useState([])
 
     const addPoint = (event, stageRef) => {
         if (event.target === stageRef?.current) {
@@ -60,7 +65,7 @@ const App = () => {
             if (connectionTo && !isExist) {
                 setConnections([
                     ...connections,
-                    new Connection(point.key, connectionTo.key, 1, BASE_CONNECTION_COLOR, new Date().getTime())
+                    new Connection(point.key, connectionTo.key, 1, BASE_CONNECTION_COLOR, new Date().getTime()),
                 ])
             }
         } else {
@@ -74,7 +79,7 @@ const App = () => {
             if (!isExist) {
                 setConnections([
                     ...connections,
-                    new Connection(from.key, to.key, 1, BASE_CONNECTION_COLOR, new Date().getTime())
+                    new Connection(from.key, to.key, 1, BASE_CONNECTION_COLOR, new Date().getTime()),
                 ])
             } else message.warn('Соединение уже существует', 1).then()
         }
@@ -87,30 +92,17 @@ const App = () => {
             row.shift()
             return row
         })
+
         try {
             let startIndex = 0, finishIndex = 0
-            // const nameFrom = fromPoint.substring(fromPoint.length - 2)
-            // const nameTo = toPoint.substring(toPoint.length - 2)
             points.forEach((point, index) => {
                 if (point.key === fromPoint) startIndex = index
                 if (point.key === toPoint) finishIndex = index
             })
-            const [distances, paths] = Dijkstra(connectionMatrix, startIndex)
-            // message.success(`Расстояние от ${nameFrom} до ${nameTo} = ${distances[finishIndex]}`, 1).then()
-            // let path = ''
-            if (paths[finishIndex][0] !== undefined) {
-                setPath(paths[finishIndex])
-                setDistance(distances[finishIndex])
-                // for (let i = 0; i < paths[finishIndex].length; i++) {
-                //     let key = points[paths[finishIndex][i]].key
-                //     path += key.substring(key.length - 2) + ' -> '
-                // }
-                // path = path.substring(0, path.length - 4)
-                // message.success(`Путь от ${nameFrom} до ${nameTo}:  ${path}`, 1).then()
-            } else {
-                setDistance(Infinity)
-                // message.warn('Путь не существует').then()
-            }
+
+            const [distance, path] = Graph.computePath(connectionMatrix, startIndex, finishIndex)
+            setDistance(distance)
+            setPath(path)
         } catch (e) {
             message.error(e).then()
         }
@@ -134,8 +126,59 @@ const App = () => {
         setMenuVisible(false)
     }
 
-    return <div className='full-height'>
-        <div className='flex-column-center align-content-space-between'>
+    const showResult = () => {
+        setResultModalVisible(true)
+        // todo фикс
+        let connectionMatrix = toConnectionMatrix(incMatrix)
+        connectionMatrix.shift()
+        connectionMatrix = connectionMatrix.map(row => {
+            row.shift()
+            return row
+        })
+        //
+        const [distances, paths] = Graph.dijkstra(connectionMatrix)
+        const fullPaths = Graph.computeFullPaths(paths)
+
+        let tablePaths = []
+        for (let i = 0; i < fullPaths.length; i++) {
+            for (let j = 0; j < fullPaths[i].length; j++) {
+                if (fullPaths[i][j].length > 1) {
+                    let path = ''
+                    for (let k = 0; k < fullPaths[i][j].length; k++) {
+                        path += fullPaths[i][j][k] + '->'
+                    }
+                    path = path.substring(0, path.length - 2)
+                    tablePaths.push({
+                        key: String(Math.random()),
+                        from: fullPaths[i][j][0],
+                        to: fullPaths[i][j].at(-1),
+                        path: path,
+                        distance: distances[i][j],
+                    })
+                }
+            }
+        }
+
+        setPathList(tablePaths)
+    }
+
+    const compareMethods = async () => {
+        // todo фикс
+        let connectionMatrix = toConnectionMatrix(incMatrix)
+        connectionMatrix.shift()
+        connectionMatrix = connectionMatrix.map(row => {
+            row.shift()
+            return row
+        })
+        //
+        const comparedTime = Graph.compareMethods(connectionMatrix)
+        await message.success(`dijkstra: ${comparedTime.dijkstra}; floyd: ${comparedTime.floyd}`, 5)
+    }
+
+    return <div className="full-height">
+        <Button style={{position: 'absolute'}} onClick={showResult}>show result</Button>
+        <Button style={{position: 'absolute', top: 33}} onClick={compareMethods}>compare methods</Button>
+        <div className="flex-column-center align-content-space-between">
             <Highlighter
                 points={points}
                 setPoints={setPoints}
@@ -144,7 +187,7 @@ const App = () => {
                 path={path}
                 distance={distance}
             />
-            <div className='flex-container space-around' style={{marginBottom: '8%'}}>
+            <div className="flex-container space-around" style={{marginBottom: '8%'}}>
                 <Matrix
                     points={points}
                     connections={connections}
@@ -189,6 +232,11 @@ const App = () => {
             setInputVisible={setInputVisible}
             selectedEntity={selectedEntity}
         />}
+        <ResultTableModal
+            visible={resultModalVisible}
+            setVisible={setResultModalVisible}
+            pathList={pathList}
+        />
     </div>
 }
 

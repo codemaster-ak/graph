@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Select} from "antd";
-import {BUTTON_WIDTH} from "../consts";
-import {getAllFileNames, getFileById, remove, save, update} from "../functions/http";
-import Point from "../classes/Point";
-import Connection from "../classes/Connection";
+import {Button, Select} from 'antd';
+import {BUTTON_WIDTH} from '../consts';
+import {getAllFileNames, getFileById, remove, save, update} from '../functions/http';
+import Point from '../classes/Point';
+import Connection from '../classes/Connection';
 
 const {Option} = Select
 
@@ -23,10 +23,6 @@ const Controls = ({
 
     const [files, setFiles] = useState([])
     const [selectedFile, setSelectedFile] = useState(undefined)
-
-    // useEffect(() => {
-    //     options().then()
-    // }, [])
 
     useEffect(() => {
         loadFiles()
@@ -57,8 +53,8 @@ const Controls = ({
         })
     }
 
-    const updateFile = () => {
-        update({matrix: incMatrix, fileName: selectedFile}).then()
+    const updateFile = async () => {
+        await update({matrix: incMatrix, fileName: selectedFile})
     }
 
     const deleteFile = () => {
@@ -86,7 +82,7 @@ const Controls = ({
                 connection.to,
                 connection.weight,
                 connection.colour,
-                connection.key
+                connection.key,
             )
         }))
     }
@@ -96,11 +92,11 @@ const Controls = ({
         setPoints([])
     }
 
-    return <div className='controls'>
-        <div className='flex-column margin-right-lg'>
-            <div className='space-between'>
+    return <div className="controls">
+        <div className="flex-column margin-right-lg">
+            <div className="space-between">
                 <Select
-                    placeholder='От'
+                    placeholder="От"
                     value={fromPoint}
                     onChange={(value) => setFromPoint(value)}
                     style={{width: 150}}
@@ -110,7 +106,7 @@ const Controls = ({
                         else return null
                     })}
                 </Select>
-                <Select placeholder='До'
+                <Select placeholder="До"
                         value={toPoint}
                         onChange={(value) => setToPoint(value)}
                         style={{width: 150}}
@@ -121,9 +117,9 @@ const Controls = ({
                     })}
                 </Select>
             </div>
-            <div className='flex-container'>
+            <div className="flex-container">
                 <Button
-                    type='primary'
+                    type="primary"
                     onClick={computePath}
                     disabled={!fromPoint || !toPoint || fromPoint === toPoint}
                     style={{marginTop: 10, marginRight: 10}}
@@ -131,7 +127,7 @@ const Controls = ({
                     Найти кратчайший путь
                 </Button>
                 <Button
-                    type='primary'
+                    type="primary"
                     onClick={clear}
                     style={{marginTop: 10, width: BUTTON_WIDTH / 2 - 5}}
                 >
@@ -139,16 +135,16 @@ const Controls = ({
                 </Button>
             </div>
         </div>
-        <div className='flex-column margin-right-lg'>
+        <div className="flex-column margin-right-lg">
             <Button
-                type='primary'
+                type="primary"
                 onClick={event => addPoint(event)}
                 disabled={incMatrix.length > 10}
             >
                 Добавить вершину
             </Button>
             <Button
-                type='primary'
+                type="primary"
                 onClick={event => addConnection(event, [fromPoint, toPoint])}
                 disabled={!fromPoint || !toPoint || fromPoint === toPoint}
                 style={{marginTop: 10}}
@@ -156,9 +152,9 @@ const Controls = ({
                 Добавить связь
             </Button>
         </div>
-        <div className='flex-column' style={{width: BUTTON_WIDTH}}>
+        <div className="flex-column" style={{width: BUTTON_WIDTH}}>
             <Select
-                placeholder='Выберите матрицу'
+                placeholder="Выберите матрицу"
                 style={{width: BUTTON_WIDTH, marginBottom: 10}}
                 value={selectedFile}
                 onChange={(value) => setSelectedFile(value)}
@@ -168,23 +164,23 @@ const Controls = ({
                     return <Option key={file.title} value={file.title}>{file.title}</Option>
                 })}
             </Select>
-            <div className='space-between'>
+            <div className="space-between">
                 <Button
-                    type='primary'
+                    type="primary"
                     onClick={download}
                     style={{width: 100}}
                 >
                     Загрузить
                 </Button>
                 <Button
-                    type='primary'
+                    type="primary"
                     onClick={selectedFile ? updateFile : createFile}
                     style={{width: 100}}
                 >
                     Сохранить
                 </Button>
                 <Button
-                    type='primary'
+                    type="primary"
                     onClick={deleteFile}
                     style={{width: 100}}
                     disabled={!selectedFile}
