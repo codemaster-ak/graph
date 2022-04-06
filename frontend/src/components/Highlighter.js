@@ -1,12 +1,25 @@
-import React, {useState} from 'react';
-import {Button} from "antd";
-import {highlightConnections, highlightPoints} from "../functions/highlight";
-import {BASE_CONNECTION_COLOR, HIGHLIGHT_CONNECTION_COLOR, HIGHLIGHT_POINT_COLOR} from "../consts";
-import Point from "../classes/Point";
-import Connection from "../classes/Connection";
+import React, {useEffect, useState} from 'react';
+import {Button} from 'antd';
+import {highlightConnections, highlightPoints} from '../functions/highlight';
+import {BASE_CONNECTION_COLOR, HIGHLIGHT_CONNECTION_COLOR, HIGHLIGHT_POINT_COLOR} from '../consts';
+import Point from '../classes/Point';
+import Connection from '../classes/Connection';
 
-const Highlighter = ({points, setPoints, connections, setConnections, path, distance}) => {
+const Highlighter = ({points, setPoints, connections, setConnections, path, distance, compareResult}) => {
 
+    useEffect(() => {
+        setInformation(distance !== Infinity && distance !== undefined
+            ? 'Путь - ' + getPathValue() + ' ' + '; Длина - ' + distance
+            : distance === Infinity && 'Путь не существует',
+        )
+    }, [distance])
+
+    useEffect(() => {
+        setInformation(compareResult)
+    }, [compareResult])
+
+
+    const [information, setInformation] = useState('')
     const [highlightToggle, setHighlightToggle] = useState(false)
 
     const toggleHighlight = () => {
@@ -21,7 +34,7 @@ const Highlighter = ({points, setPoints, connections, setConnections, path, dist
                     connection.to,
                     connection.weight,
                     BASE_CONNECTION_COLOR,
-                    connection.key
+                    connection.key,
                 )
                 else return connection
             }))
@@ -44,32 +57,27 @@ const Highlighter = ({points, setPoints, connections, setConnections, path, dist
         return value.substring(0, value.length - 4)
     }
 
-    return <div className='highlighter' style={{marginBottom: '5%'}}>
-        <div className='flex-column'>
-            <div className='flex-center'>
-                <Button
-                    type='primary'
-                    onClick={toggleHighlight}
-                    disabled={path.length === 0 || distance === Infinity}
-                    style={{width: 150}}
-                >
-                    {highlightToggle ? 'Отключить показ' : 'Показать маршрут'}
-                </Button>
-            </div>
-            <p
-                className='no-margin'
-                style={{
-                    marginTop: 10,
-                    marginBottom: distance ? 0 : 14,
-                    textAlign: 'center'
-                }}
+    return <div className="flex-column" style={{padding: 16}}>
+        <div className="flex-center">
+            <Button
+                type="primary"
+                onClick={toggleHighlight}
+                disabled={path.length === 0 || distance === Infinity}
+                style={{width: 150}}
             >
-                {distance !== Infinity && distance !== undefined
-                    ? 'Путь - ' + getPathValue() + ' ' + '; Длина - ' + distance
-                    : distance === Infinity && 'Путь не существует'
-                }
-            </p>
+                {highlightToggle ? 'Отключить показ' : 'Показать маршрут'}
+            </Button>
         </div>
+        <p
+            className="no-margin"
+            style={{
+                marginTop: 10,
+                marginBottom: distance ? 0 : 14,
+                textAlign: 'center',
+            }}
+        >
+            {information}
+        </p>
     </div>
 }
 

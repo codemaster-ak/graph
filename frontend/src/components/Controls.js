@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Select} from 'antd';
-import {BUTTON_WIDTH} from '../consts';
+import {Button, Radio, Select} from 'antd';
+import {BUTTON_WIDTH, COMPUTE_METHODS} from '../consts';
 import {getAllFileNames, getFileById, remove, save, update} from '../functions/http';
 import Point from '../classes/Point';
 import Connection from '../classes/Connection';
@@ -19,6 +19,8 @@ const Controls = ({
                       computePath,
                       addPoint,
                       addConnection,
+                      selectedMethod,
+                      setSelectedMethod,
                   }) => {
 
     const [files, setFiles] = useState([])
@@ -92,7 +94,7 @@ const Controls = ({
         setPoints([])
     }
 
-    return <div className="controls">
+    return <div className="row-flex-center">
         <div className="flex-column margin-right-lg">
             <div className="space-between">
                 <Select
@@ -118,6 +120,10 @@ const Controls = ({
                 </Select>
             </div>
             <div className="flex-container">
+                <Radio.Group value={selectedMethod} onChange={event => setSelectedMethod(event.target.value)}>
+                    <Radio value={COMPUTE_METHODS.Dijkstra}>Метод Дейкстры</Radio>
+                    <Radio value={COMPUTE_METHODS.Floyd}>Метод Флойда</Radio>
+                </Radio.Group>
                 <Button
                     type="primary"
                     onClick={computePath}
@@ -169,6 +175,7 @@ const Controls = ({
                     type="primary"
                     onClick={download}
                     style={{width: 100}}
+                    disabled={!selectedFile}
                 >
                     Загрузить
                 </Button>

@@ -1,18 +1,27 @@
-import {Layout, Menu, message} from 'antd';
 import React, {useState} from 'react';
-import Content from './Content';
-import ResultTableModal from './components/ResultTableModal';
-import {getMousePos} from './functions/canvasFunctions';
+import './App.css';
+import Matrix from './components/Matrix';
+import Canvas from './components/Canvas';
 import Point from './classes/Point';
-import {BASE_CONNECTION_COLOR, COMPUTE_METHODS, STAGE_SIZE} from './consts';
 import Connection from './classes/Connection';
-import toConnectionMatrix from './functions/toConnectionMatrix';
-import getMatrixValues from './functions/getMatrixValues';
-import Graph from './classes/Graph';
-import Highlighter from './components/Highlighter';
+import {Button, message} from 'antd';
+import {getMousePos} from './functions/canvasFunctions';
+import {BASE_CONNECTION_COLOR, STAGE_SIZE} from './consts';
 import Controls from './components/Controls';
+import Highlighter from './components/Highlighter';
+import toConnectionMatrix from './functions/toConnectionMatrix';
+import DropDownMenu from './components/DropDownMenu';
+import Graph from './classes/Graph';
+import ResultTableModal from './components/ResultTableModal';
+import getMatrixValues from './functions/getMatrixValues';
 
-const App = () => {
+const AppPrev = () => {
+
+    /**
+     * Матрица смежности
+     * Значение - это вес ребра между вершиной и вершиной, 0 означает отсутствие самоконтроля, Infinity означает
+     * отсутствие ребра
+     * */
 
     const [points, setPoints] = useState([])
     const [connections, setConnections] = useState([])
@@ -21,7 +30,6 @@ const App = () => {
     const [distance, setDistance] = useState(undefined)
     const [fromPoint, setFromPoint] = useState(undefined)
     const [toPoint, setToPoint] = useState(undefined)
-    const [compareResult, setCompareResult] = useState('')
 
     const [menuVisible, setMenuVisible] = useState(false)
     const [inputVisible, setInputVisible] = useState(false)
@@ -30,9 +38,6 @@ const App = () => {
 
     const [resultModalVisible, setResultModalVisible] = useState(false)
     const [pathList, setPathList] = useState([])
-
-    const [collapsed, setCollapsed] = useState(false)
-    const [selectedMethod, setSelectedMethod] = useState(COMPUTE_METHODS.Dijkstra)
 
     const addPoint = (event, stageRef) => {
         if (event.target === stageRef?.current) {
@@ -92,12 +97,30 @@ const App = () => {
                 if (point.key === toPoint) finishIndex = index
             })
 
-            const [distance, path] = Graph.computePath(connectionMatrix, startIndex, finishIndex, selectedMethod)
+            const [distance, path] = Graph.computePath(connectionMatrix, startIndex, finishIndex)
             setDistance(distance)
             setPath(path)
         } catch (e) {
             message.error(e).then()
         }
+    }
+
+    const deleteConnection = () => {
+        setConnections(connections.filter(connection => {
+            return connection.from !== selectedEntity.from || connection.to !== selectedEntity.to
+        }))
+        setMenuVisible(false)
+    }
+
+    const changeWeight = (weight) => {
+        setConnections(connections.map(connection => {
+            if (connection.from === selectedEntity.from && connection.to === selectedEntity.to) {
+                connection.weight = weight
+            }
+            return connection
+        }))
+        setInputVisible(false)
+        setMenuVisible(false)
     }
 
     const showResult = () => {
@@ -133,85 +156,76 @@ const App = () => {
         setPathList(tablePaths)
     }
 
-    const compareMethods = () => {
+    const compareMethods = async () => {
         let connectionMatrix = toConnectionMatrix(incMatrix)
         connectionMatrix = getMatrixValues(connectionMatrix)
         const comparedTime = Graph.compareMethods(connectionMatrix)
-        setCompareResult(`dijkstra: ${comparedTime.dijkstra}; floyd: ${comparedTime.floyd}`)
+        await message.success(`dijkstra: ${comparedTime.dijkstra}; floyd: ${comparedTime.floyd}`, 5)
     }
 
-    const onCollapse = (collapsed) => {
-        setCollapsed(collapsed)
-    }
-
-    return <Layout style={{minHeight: '100vh'}}>
-        <Layout.Sider theme="dark" collapsible collapsed={collapsed} onCollapse={onCollapse}>
-            <Menu theme="dark" mode="inline">
-                <Menu.Item key="showTable" onClick={showResult}>
-                    Вывести таблицу
-                </Menu.Item>
-                <Menu.Item key="compareMethod" onClick={compareMethods}>
-                    Сравнить методы
-                </Menu.Item>
-                {/*<Menu.Item onClick={() => {console.log('files')}} key="9" icon={<FileOutlined/>}>*/}
-                {/*    Файлы*/}
-                {/*</Menu.Item>*/}
-            </Menu>
-        </Layout.Sider>
-        <Layout className="site-layout">
-            <Layout.Header style={{background: '#fff', height: 120}}>
-                <Highlighter
+    return <div>
+        <Button style={{position: 'absolute'}} onClick={showResult}>show result</Button>
+        <Button style={{position: 'absolute', top: 33}} onClick={compareMethods}>compare methods</Button>
+        <div className="flex-column-center align-content-space-between">
+            <Highlighter
+                points={points}
+                setPoints={setPoints}
+                connections={connections}
+                setConnections={setConnections}
+                path={path}
+                distance={distance}
+            />
+            <div className="flex-container space-around" style={{marginBottom: '8%'}}>
+                <Matrix
                     points={points}
-                    setPoints={setPoints}
-                    connections={connections}
-                    setConnections={setConnections}
-                    path={path}
-                    distance={distance}
-                    compareResult={compareResult}
-                />
-            </Layout.Header>
-            <Layout.Content style={{margin: '0 16px'}}>
-                <Content
-                    points={points}
-                    setPoints={setPoints}
                     connections={connections}
                     setConnections={setConnections}
                     incMatrix={incMatrix}
                     setIncMatrix={setIncMatrix}
+                />
+                <Canvas
+                    points={points}
+                    setPoints={setPoints}
+                    connections={connections}
+                    setConnections={setConnections}
+                    addPoint={addPoint}
+                    addConnection={addConnection}
+                    setMenuStyle={setMenuStyle}
+                    setInputVisible={setInputVisible}
                     menuVisible={menuVisible}
                     setMenuVisible={setMenuVisible}
-                    inputVisible={inputVisible}
-                    setInputVisible={setInputVisible}
-                    menuStyle={menuStyle}
-                    setMenuStyle={setMenuStyle}
                     selectedEntity={selectedEntity}
                     setSelectedEntity={setSelectedEntity}
                 />
-            </Layout.Content>
-            <Layout.Footer style={{background: '#fff'}}>
-                <Controls
-                    setPoints={setPoints}
-                    setConnections={setConnections}
-                    incMatrix={incMatrix}
-                    setIncMatrix={setIncMatrix}
-                    toPoint={toPoint}
-                    fromPoint={fromPoint}
-                    setFromPoint={setFromPoint}
-                    setToPoint={setToPoint}
-                    computePath={computePath}
-                    addPoint={addPoint}
-                    addConnection={addConnection}
-                    selectedMethod={selectedMethod}
-                    setSelectedMethod={setSelectedMethod}
-                />
-            </Layout.Footer>
-        </Layout>
+            </div>
+            <Controls
+                setPoints={setPoints}
+                setConnections={setConnections}
+                incMatrix={incMatrix}
+                setIncMatrix={setIncMatrix}
+                toPoint={toPoint}
+                fromPoint={fromPoint}
+                setFromPoint={setFromPoint}
+                setToPoint={setToPoint}
+                computePath={computePath}
+                addPoint={addPoint}
+                addConnection={addConnection}
+            />
+        </div>
+        {menuVisible && <DropDownMenu
+            deleteConnection={deleteConnection}
+            changeWeight={changeWeight}
+            menuStyle={menuStyle}
+            inputVisible={inputVisible}
+            setInputVisible={setInputVisible}
+            selectedEntity={selectedEntity}
+        />}
         <ResultTableModal
             visible={resultModalVisible}
             setVisible={setResultModalVisible}
             pathList={pathList}
         />
-    </Layout>
+    </div>
 }
 
-export default App;
+export default AppPrev;

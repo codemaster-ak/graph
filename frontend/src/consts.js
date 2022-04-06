@@ -15,7 +15,7 @@ export const HTTP_METHODS = {
     POST: 'POST',
     PUT: 'PUT',
     DELETE: 'DELETE',
-    OPTIONS: 'OPTIONS'
+    OPTIONS: 'OPTIONS',
 }
 
 export const BASE_INIT = {
@@ -23,6 +23,11 @@ export const BASE_INIT = {
     headers: {
         Accept: 'application/json',
         protocol: 'http',
-        'Content-Type': 'application/json'
-    }
+        'Content-Type': 'application/json',
+    },
+}
+
+export const COMPUTE_METHODS = {// todo enum Methods
+    Dijkstra: 'Dijkstra',
+    Floyd: 'Floyd',
 }

@@ -1,17 +1,23 @@
-class Graph {//todo private with typescript
-    static computePath(matrix, startPoint, finishPoint, method = 'Dijkstra') {
-        let distances
-        let paths
+import {COMPUTE_METHODS} from '../consts';
 
-        if (method === 'Dijkstra') {
-            [distances, paths] = this.dijkstra(matrix, startPoint)
-        } else {
-            distances = this.floyd(matrix, startPoint)
+class Graph {//todo private with typescript
+    static computePath(matrix, startPoint, finishPoint, method = COMPUTE_METHODS.Dijkstra) {
+        let distances
+        let distance
+
+        if (method === COMPUTE_METHODS.Dijkstra) {
+            distances = this.dijkstra(matrix, startPoint)
+            distance = distances[finishPoint]
         }
+        if (method === COMPUTE_METHODS.Floyd) {
+            distances = this.floyd(matrix, startPoint)
+            distance = distances[startPoint][finishPoint]
+        }
+        const paths = this.pathsFromMatrix(matrix)
         const fullPaths = this.computeFullPaths(paths, startPoint)
 
         if (fullPaths[finishPoint][0] !== undefined) {
-            const distance = distances[finishPoint]
+            // const distance = distances[startPoint][finishPoint]
             const path = fullPaths[finishPoint]
             return [distance, path]
         } else {
@@ -19,14 +25,14 @@ class Graph {//todo private with typescript
         }
     }
 
-    static compareMethods(matrix) {
+    static compareMethods(matrix, cyclesCount = 10000) {
         const dijkstraStart = new Date().getTime()
-        for (let i = 0; i < 10000; i++) {
+        for (let i = 0; i < cyclesCount; i++) {
             this.dijkstra(matrix)
         }
         const dijkstraFinish = new Date().getTime()
         const floydStart = new Date().getTime()
-        for (let i = 0; i < 10000; i++) {
+        for (let i = 0; i < cyclesCount; i++) {
             this.floyd(matrix)
         }
         const floydFinish = new Date().getTime()
@@ -37,13 +43,16 @@ class Graph {//todo private with typescript
         if (startPoint !== undefined) return this.dijkstraPoint(matrix, startPoint)
         else {
             let distances = []
-            let paths = []
+            // let paths = []
             for (let i = 0; i < matrix.length; i++) {
-                const [result, path] = this.dijkstraPoint(matrix, i)
+                // const [result, path] = this.dijkstraPoint(matrix, i)
+                const result = this.dijkstraPoint(matrix, i)
                 distances.push(result)
-                paths.push(path)
+                // paths.push(path)
             }
-            return [distances, paths]
+
+            // return [distances, paths]
+            return distances
         }
     }
 
@@ -51,8 +60,8 @@ class Graph {//todo private with typescript
         let i = startPoint
 
         let viewed = [startPoint]
-        let path = new Array(matrix.length).fill(undefined)
-        path[startPoint] = startPoint
+        // let path = new Array(matrix.length).fill(undefined)
+        // path[startPoint] = startPoint
         let result = new Array(matrix.length).fill(Infinity)
         result[startPoint] = 0
 
@@ -60,18 +69,20 @@ class Graph {//todo private with typescript
             for (let j = 0; j < matrix.length; j++) {
                 if (!viewed.includes(j) && result[i] + matrix[i][j] < result[j]) {
                     result[j] = result[i] + matrix[i][j]
-                    path[j] = i
+                    // path[j] = i
                 }
             }
             i = this.minDistance(result, viewed)
             if (i !== undefined) viewed.push(i)
         }
 
-        return [result, path]
+        // return [result, path]
+        return result
     }
 
-    static floyd(matrix) {//todo построение пути
+    static floyd(matrix) {
         let matrixCopy = this.copyMatrix(matrix)
+
         for (let k = 0; k < matrixCopy.length; k++) {
             for (let i = 0; i < matrixCopy.length; i++) {
                 for (let j = 0; j < matrixCopy.length; j++) {
@@ -91,54 +102,30 @@ class Graph {//todo private with typescript
     }
 
     static computeFullPaths(paths, startPoint) {
-        if (startPoint !== undefined) {
-            const i = startPoint
-            let fullPaths = []
+        let allFullPaths = []
 
-            for (let j = 0; j < paths.length; j++) {
+        for (let i = 0; i < paths.length; i++) {
+            let fullPaths = []
+            for (let j = 0; j < paths[i].length; j++) {
                 let start = i
                 let finish = j
                 let fullPath = []
 
-                if (paths[finish] !== undefined) fullPath = [finish]
+                if (paths[i][finish] !== undefined) fullPath = [finish]
                 else fullPath = [undefined]
 
                 while (finish !== undefined && start !== finish) {
-                    finish = paths[finish]
+                    finish = paths[i][finish]
                     fullPath.unshift(finish)
                 }
 
                 if (fullPath[0] !== undefined) fullPaths.push(fullPath)
                 else fullPaths.push([fullPath[0]])
             }
-
-            return fullPaths
-        } else {
-            let allFullPaths = []
-
-            for (let i = 0; i < paths.length; i++) {
-                let fullPaths = []
-                for (let j = 0; j < paths[i].length; j++) {
-                    let start = i
-                    let finish = j
-                    let fullPath = []
-
-                    if (paths[i][finish] !== undefined) fullPath = [finish]
-                    else fullPath = [undefined]
-
-                    while (finish !== undefined && start !== finish) {
-                        finish = paths[i][finish]
-                        fullPath.unshift(finish)
-                    }
-
-                    if (fullPath[0] !== undefined) fullPaths.push(fullPath)
-                    else fullPaths.push([fullPath[0]])
-                }
-                allFullPaths.push(fullPaths)
-            }
-
-            return allFullPaths
+            allFullPaths.push(fullPaths)
         }
+
+        return startPoint !== undefined ? allFullPaths[startPoint] : allFullPaths
     }
 
     static minDistance(distances, viewed) {
@@ -163,6 +150,31 @@ class Graph {//todo private with typescript
             }
         }
         return matrixCopy
+    }
+
+    static pathsFromMatrix(matrix) {
+        let paths = []
+        for (let i = 0; i < matrix.length; i++) {
+            let j = i
+            let viewed = [j]
+            let path = new Array(matrix.length).fill(undefined)
+            path[j] = j
+            let result = new Array(matrix.length).fill(Infinity)
+            result[j] = 0
+
+            while (j !== undefined) {
+                for (let k = 0; k < matrix.length; k++) {
+                    if (!viewed.includes(k) && result[j] + matrix[j][k] < result[k]) {
+                        result[k] = result[j] + matrix[j][k]
+                        path[k] = j
+                    }
+                }
+                j = this.minDistance(result, viewed)
+                if (j !== undefined) viewed.push(j)
+            }
+            paths.push(path)
+        }
+        return paths
     }
 }
 
