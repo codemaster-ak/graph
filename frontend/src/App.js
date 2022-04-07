@@ -188,7 +188,7 @@ const App = () => {
                     setSelectedEntity={setSelectedEntity}
                 />
             </Layout.Content>
-            <Layout.Footer style={{background: '#fff'}}>
+            <Layout.Footer style={{background: '#fff', height: 120}}>
                 <Controls
                     setPoints={setPoints}
                     setConnections={setConnections}

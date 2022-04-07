@@ -91,38 +91,28 @@ const Content = ({
         setMenuVisible(false)
     }
 
-    return <div className="flex-column-center align-content-space-between">
-        <div className="flex-container space-around" style={{margin: '8% 0 8% 0'}}>
-            <Matrix
-                points={points}
-                connections={connections}
-                setConnections={setConnections}
-                incMatrix={incMatrix}
-                setIncMatrix={setIncMatrix}
-            />
-            <Canvas
-                points={points}
-                setPoints={setPoints}
-                connections={connections}
-                setConnections={setConnections}
-                addPoint={addPoint}
-                addConnection={addConnection}
-                setMenuStyle={setMenuStyle}
-                setInputVisible={setInputVisible}
-                menuVisible={menuVisible}
-                setMenuVisible={setMenuVisible}
-                selectedEntity={selectedEntity}
-                setSelectedEntity={setSelectedEntity}
-            />
-            {menuVisible && <DropDownMenu
-                deleteConnection={deleteConnection}
-                changeWeight={changeWeight}
-                menuStyle={menuStyle}
-                inputVisible={inputVisible}
-                setInputVisible={setInputVisible}
-                selectedEntity={selectedEntity}
-            />}
-        </div>
+    return <div className="flex-container space-around" style={{margin: '8% 0 4% 0'}}>
+        <Matrix
+            points={points}
+            connections={connections}
+            setConnections={setConnections}
+            incMatrix={incMatrix}
+            setIncMatrix={setIncMatrix}
+        />
+        <Canvas
+            points={points}
+            setPoints={setPoints}
+            connections={connections}
+            setConnections={setConnections}
+            addPoint={addPoint}
+            addConnection={addConnection}
+            setMenuStyle={setMenuStyle}
+            setInputVisible={setInputVisible}
+            menuVisible={menuVisible}
+            setMenuVisible={setMenuVisible}
+            selectedEntity={selectedEntity}
+            setSelectedEntity={setSelectedEntity}
+        />
         {menuVisible && <DropDownMenu
             deleteConnection={deleteConnection}
             changeWeight={changeWeight}
