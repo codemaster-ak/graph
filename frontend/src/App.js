@@ -144,9 +144,9 @@ const App = () => {
         setCollapsed(collapsed)
     }
 
-    return <Layout className="flex-row-center full-height">
-        <div className="flex-center" style={{flexGrow: 2}}>
-            <div className="padding shadow rounded" style={{background: '#fff', width: "fit-content"}}>
+    return <Layout className="flex-row-space-between" style={{minHeight: '100vh'}}>
+        <div className="flex-column-center" style={{flexGrow: 2,minHeight: '100vh'}}>
+            <div className="padding rounded" style={{background: '#fff', width: "fit-content"}}>
                 <Controls
                     setPoints={setPoints}
                     setConnections={setConnections}

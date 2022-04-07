@@ -94,7 +94,7 @@ const Controls = ({
         setPoints([])
     }
 
-    return <div className="">
+    return <div>
         <div className="margin-bottom-lg">
             <Radio.Group className="item space-between" buttonStyle="solid" value={selectedMethod} onChange={event => setSelectedMethod(event.target.value)}>
                 <Radio.Button value={COMPUTE_METHODS.Dijkstra} style={{width: BUTTON_WIDTH / 2 - 2, textAlign: "center"}}>Дейкстра</Radio.Button>
