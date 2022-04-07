@@ -214,7 +214,7 @@ const Canvas = ({
         onDblClick={event => addPoint(event, stageRef)}
         onContextMenu={event => onContextMenu(event)}
         ref={stageRef}
-        className='flex-grow-1 flex-center'
+        className='flex-center padding'
     >
         <Layer>
             {/** порядок borders и pointObjs не менять */}

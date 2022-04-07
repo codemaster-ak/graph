@@ -19,7 +19,7 @@ const MatrixCell = ({row, col, colValue, incMatrix, changeWeight}) => {
                     value={incMatrix[row][col]}
                     readOnly={incMatrix[row][col] === 0}
                     onChange={(value) => changeWeight(value, row, col)}
-                    style={{width: 60, border: '1px solid #000000'}}
+                    style={{width: "100%", height: "100%", border: "none"}}
                 />
         }
     </div>

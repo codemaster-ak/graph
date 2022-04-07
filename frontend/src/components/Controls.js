@@ -94,14 +94,22 @@ const Controls = ({
         setPoints([])
     }
 
-    return <div className="row-flex-center">
-        <div className="flex-column margin-right-lg">
+    return <div className="">
+        <div className="margin-bottom-lg">
+            <Radio.Group className="item space-between" buttonStyle="solid" value={selectedMethod} onChange={event => setSelectedMethod(event.target.value)}>
+                <Radio.Button value={COMPUTE_METHODS.Dijkstra} style={{width: BUTTON_WIDTH / 2 - 2, textAlign: "center"}}>Дейкстра</Radio.Button>
+                <Radio.Button value={COMPUTE_METHODS.Floyd} style={{width: BUTTON_WIDTH / 2 - 2, textAlign: "center"}}>Флойд</Radio.Button>
+            </Radio.Group>
+        </div>
+        <div className="flex-column margin-bottom-lg">
+
             <div className="space-between">
                 <Select
                     placeholder="От"
                     value={fromPoint}
                     onChange={(value) => setFromPoint(value)}
-                    style={{width: 150}}
+                    style={{width: BUTTON_WIDTH / 2 - 2}}
+                    className="margin-bottom-xs"
                 >
                     {incMatrix.map((row, index) => {
                         if (index > 0) return <Option value={row[0].key} key={row[0].key}>{row[0].name}</Option>
@@ -111,7 +119,8 @@ const Controls = ({
                 <Select placeholder="До"
                         value={toPoint}
                         onChange={(value) => setToPoint(value)}
-                        style={{width: 150}}
+                        style={{width: BUTTON_WIDTH / 2 - 2}}
+                        className="margin-bottom-xs"
                 >
                     {incMatrix.map((row, index) => {
                         if (index > 0) return <Option value={row[0].key} key={row[0].key}>{row[0].name}</Option>
@@ -119,33 +128,23 @@ const Controls = ({
                     })}
                 </Select>
             </div>
-            <div className="flex-container">
-                <Radio.Group value={selectedMethod} onChange={event => setSelectedMethod(event.target.value)}>
-                    <Radio value={COMPUTE_METHODS.Dijkstra}>Метод Дейкстры</Radio>
-                    <Radio value={COMPUTE_METHODS.Floyd}>Метод Флойда</Radio>
-                </Radio.Group>
-                <Button
-                    type="primary"
-                    onClick={computePath}
-                    disabled={!fromPoint || !toPoint || fromPoint === toPoint}
-                    style={{marginTop: 10, marginRight: 10}}
-                >
-                    Найти кратчайший путь
-                </Button>
-                <Button
-                    type="primary"
-                    onClick={clear}
-                    style={{marginTop: 10, width: BUTTON_WIDTH / 2 - 5}}
-                >
-                    Очистить
-                </Button>
-            </div>
-        </div>
-        <div className="flex-column margin-right-lg">
+
+            <Button
+                type="primary"
+                onClick={computePath}
+                disabled={!fromPoint || !toPoint || fromPoint === toPoint}
+                style={{width: BUTTON_WIDTH}}
+                className="margin-bottom-xs"
+            >
+                Найти кратчайший путь
+            </Button>
+
             <Button
                 type="primary"
                 onClick={event => addPoint(event)}
                 disabled={incMatrix.length > 10}
+                style={{width: BUTTON_WIDTH}}
+                className="margin-bottom-xs"
             >
                 Добавить вершину
             </Button>
@@ -153,47 +152,62 @@ const Controls = ({
                 type="primary"
                 onClick={event => addConnection(event, [fromPoint, toPoint])}
                 disabled={!fromPoint || !toPoint || fromPoint === toPoint}
-                style={{marginTop: 10}}
+                style={{width: BUTTON_WIDTH}}
+                className="margin-bottom-xs"
             >
                 Добавить связь
             </Button>
         </div>
-        <div className="flex-column" style={{width: BUTTON_WIDTH}}>
+
+        <div className="flex-column margin-bottom-lg">
             <Select
                 placeholder="Выберите матрицу"
                 style={{width: BUTTON_WIDTH, marginBottom: 10}}
                 value={selectedFile}
                 onChange={(value) => setSelectedFile(value)}
                 allowClear
+                className="margin-bottom-xs"
             >
                 {files.map(file => {
                     return <Option key={file.title} value={file.title}>{file.title}</Option>
                 })}
             </Select>
-            <div className="space-between">
+            <div className="flex-column">
                 <Button
                     type="primary"
                     onClick={download}
-                    style={{width: 100}}
+                    style={{width: BUTTON_WIDTH}}
                     disabled={!selectedFile}
+                    className="margin-bottom-xs"
                 >
                     Загрузить
                 </Button>
                 <Button
                     type="primary"
                     onClick={selectedFile ? updateFile : createFile}
-                    style={{width: 100}}
+                    style={{width: BUTTON_WIDTH}}
+                    className="margin-bottom-xs"
                 >
                     Сохранить
                 </Button>
-                <Button
-                    type="primary"
-                    onClick={deleteFile}
-                    style={{width: 100}}
-                    disabled={!selectedFile}
-                >
-                    Удалить
-                </Button>
+                <div className="space-between">
+                    <Button
+                        type="primary"
+                        onClick={clear}
+                        style={{width: BUTTON_WIDTH / 2 - 2}}
+                    >
+                        Очистить
+                    </Button>
+                    <Button
+                        type="primary"
+                        onClick={deleteFile}
+                        style={{width: BUTTON_WIDTH / 2 - 2}}
+                        disabled={!selectedFile}
+                    >
+                        Удалить
+                    </Button>
+                </div>
+
             </div>
         </div>
     </div>

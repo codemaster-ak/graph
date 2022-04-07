@@ -1,10 +1,10 @@
-import {Layout, Menu, message} from 'antd';
+import {Button, Layout, Menu, message} from 'antd';
 import React, {useState} from 'react';
 import Content from './Content';
 import ResultTableModal from './components/ResultTableModal';
 import {getMousePos} from './functions/canvasFunctions';
 import Point from './classes/Point';
-import {BASE_CONNECTION_COLOR, COMPUTE_METHODS, STAGE_SIZE} from './consts';
+import {BASE_CONNECTION_COLOR, BUTTON_WIDTH, COMPUTE_METHODS, STAGE_SIZE} from './consts';
 import Connection from './classes/Connection';
 import toConnectionMatrix from './functions/toConnectionMatrix';
 import getMatrixValues from './functions/getMatrixValues';
@@ -144,22 +144,42 @@ const App = () => {
         setCollapsed(collapsed)
     }
 
-    return <Layout style={{minHeight: '100vh'}}>
-        <Layout.Sider theme="dark" collapsible collapsed={collapsed} onCollapse={onCollapse}>
-            <Menu theme="dark" mode="inline">
-                <Menu.Item key="showTable" onClick={showResult}>
-                    Вывести таблицу
-                </Menu.Item>
-                <Menu.Item key="compareMethod" onClick={compareMethods}>
-                    Сравнить методы
-                </Menu.Item>
-                {/*<Menu.Item onClick={() => {console.log('files')}} key="9" icon={<FileOutlined/>}>*/}
-                {/*    Файлы*/}
-                {/*</Menu.Item>*/}
-            </Menu>
-        </Layout.Sider>
-        <Layout className="site-layout">
-            <Layout.Header style={{background: '#fff', height: 120}}>
+    return <Layout className="flex-row-center full-height">
+        <div className="flex-center" style={{flexGrow: 2}}>
+            <div className="padding shadow rounded" style={{background: '#fff', width: "fit-content"}}>
+                <Controls
+                    setPoints={setPoints}
+                    setConnections={setConnections}
+                    incMatrix={incMatrix}
+                    setIncMatrix={setIncMatrix}
+                    toPoint={toPoint}
+                    fromPoint={fromPoint}
+                    setFromPoint={setFromPoint}
+                    setToPoint={setToPoint}
+                    computePath={computePath}
+                    addPoint={addPoint}
+                    addConnection={addConnection}
+                    selectedMethod={selectedMethod}
+                    setSelectedMethod={setSelectedMethod}
+                />
+                <div className="flex-column margin-bottom-lg">
+                    <Button
+                        type="primary"
+                        onClick={showResult}
+                        style={{width: BUTTON_WIDTH}}
+                        className="margin-bottom-xs"
+                    >
+                        Вывести таблицу
+                    </Button>
+                    <Button
+                        type="primary"
+                        onClick={compareMethods}
+                        style={{width: BUTTON_WIDTH}}
+                        className="margin-bottom-xs"
+                    >
+                        Сравнить методы
+                    </Button>
+                </div>
                 <Highlighter
                     points={points}
                     setPoints={setPoints}
@@ -169,8 +189,24 @@ const App = () => {
                     distance={distance}
                     compareResult={compareResult}
                 />
-            </Layout.Header>
-            <Layout.Content style={{margin: '0 16px'}}>
+            </div>
+        </div>
+        {/*<Layout.Sider theme="dark" collapsible collapsed={collapsed} onCollapse={onCollapse}>*/}
+        {/*    <Menu theme="dark" mode="inline">*/}
+        {/*        <Menu.Item key="showTable" onClick={showResult}>*/}
+        {/*            Вывести таблицу*/}
+        {/*        </Menu.Item>*/}
+        {/*        <Menu.Item key="compareMethod" onClick={compareMethods}>*/}
+        {/*            Сравнить методы*/}
+        {/*        </Menu.Item>*/}
+        {/*        /!*<Menu.Item onClick={() => {console.log('files')}} key="9" icon={<FileOutlined/>}>*!/*/}
+        {/*        /!*    Файлы*!/*/}
+        {/*        /!*</Menu.Item>*!/*/}
+        {/*    </Menu>*/}
+        {/*</Layout.Sider>*/}
+        {/*<Layout className="site-layout">*/}
+
+            <div style={{flexGrow: 1}}>
                 <Content
                     points={points}
                     setPoints={setPoints}
@@ -187,25 +223,9 @@ const App = () => {
                     selectedEntity={selectedEntity}
                     setSelectedEntity={setSelectedEntity}
                 />
-            </Layout.Content>
-            <Layout.Footer style={{background: '#fff', height: 120}}>
-                <Controls
-                    setPoints={setPoints}
-                    setConnections={setConnections}
-                    incMatrix={incMatrix}
-                    setIncMatrix={setIncMatrix}
-                    toPoint={toPoint}
-                    fromPoint={fromPoint}
-                    setFromPoint={setFromPoint}
-                    setToPoint={setToPoint}
-                    computePath={computePath}
-                    addPoint={addPoint}
-                    addConnection={addConnection}
-                    selectedMethod={selectedMethod}
-                    setSelectedMethod={setSelectedMethod}
-                />
-            </Layout.Footer>
-        </Layout>
+            </div>
+
+        {/*</Layout>*/}
         <ResultTableModal
             visible={resultModalVisible}
             setVisible={setResultModalVisible}

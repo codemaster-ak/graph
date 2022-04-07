@@ -39,7 +39,7 @@ const Matrix = ({points, connections, setConnections, incMatrix, setIncMatrix}) 
         }
     }
 
-    return <div className='flex-grow-1 flex-center'>
+    return <div className='flex-center padding'>
         <div className='matrix'>
             <div className='flex-column' style={{height: 570, overflowX: 'auto'}}>
                 {incMatrix.map((row, indexRow) => {

@@ -91,7 +91,7 @@ const Content = ({
         setMenuVisible(false)
     }
 
-    return <div className="flex-container space-around" style={{margin: '8% 0 4% 0'}}>
+    return <div className="flex-container">
         <Matrix
             points={points}
             connections={connections}

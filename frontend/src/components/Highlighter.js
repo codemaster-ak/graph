@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button} from 'antd';
 import {highlightConnections, highlightPoints} from '../functions/highlight';
-import {BASE_CONNECTION_COLOR, HIGHLIGHT_CONNECTION_COLOR, HIGHLIGHT_POINT_COLOR} from '../consts';
+import {BASE_CONNECTION_COLOR, BUTTON_WIDTH, HIGHLIGHT_CONNECTION_COLOR, HIGHLIGHT_POINT_COLOR} from '../consts';
 import Point from '../classes/Point';
 import Connection from '../classes/Connection';
 
@@ -57,13 +57,13 @@ const Highlighter = ({points, setPoints, connections, setConnections, path, dist
         return value.substring(0, value.length - 4)
     }
 
-    return <div className="flex-column" style={{padding: 16}}>
-        <div className="flex-center">
+    return <div className="flex-column ">
+        <div className="flex-center margin-bottom-xs">
             <Button
                 type="primary"
                 onClick={toggleHighlight}
                 disabled={path.length === 0 || distance === Infinity}
-                style={{width: 150}}
+                style={{width: BUTTON_WIDTH}}
             >
                 {highlightToggle ? 'Отключить показ' : 'Показать маршрут'}
             </Button>
@@ -71,9 +71,9 @@ const Highlighter = ({points, setPoints, connections, setConnections, path, dist
         <p
             className="no-margin"
             style={{
-                marginTop: 10,
                 marginBottom: distance ? 0 : 14,
                 textAlign: 'center',
+                width: BUTTON_WIDTH
             }}
         >
             {information}

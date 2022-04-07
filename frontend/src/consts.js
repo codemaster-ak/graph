@@ -1,7 +1,7 @@
 export const SIZE = 20
 export const STAGE_SIZE = 500
 
-export const BUTTON_WIDTH = 310
+export const BUTTON_WIDTH = 250
 
 export const BASE_POINT_COLOR = '#1890ff'
 export const BASE_CONNECTION_COLOR = '#656565'
@@ -28,6 +28,6 @@ export const BASE_INIT = {
 }
 
 export const COMPUTE_METHODS = {// todo enum Methods
-    Dijkstra: 'Dijkstra',
-    Floyd: 'Floyd',
+    Dijkstra: 'Дейкстра',
+    Floyd: 'Флойд',
 }
