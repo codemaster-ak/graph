@@ -145,7 +145,7 @@ const App = () => {
     }
 
     return <Layout className="flex-row-space-between" style={{minHeight: '100vh'}}>
-        <div className="flex-column-center" style={{flexGrow: 2,minHeight: '100vh'}}>
+        <div className="flex-column-center" style={{minHeight: '100vh'}}>
             <div className="padding rounded" style={{background: '#fff', width: "fit-content"}}>
                 <Controls
                     setPoints={setPoints}
@@ -206,7 +206,7 @@ const App = () => {
         {/*</Layout.Sider>*/}
         {/*<Layout className="site-layout">*/}
 
-            <div style={{flexGrow: 1}}>
+            <div className="flex-center full-width">
                 <Content
                     points={points}
                     setPoints={setPoints}

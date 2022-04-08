@@ -20,6 +20,7 @@ const Highlighter = ({points, setPoints, connections, setConnections, path, dist
 
 
     const [information, setInformation] = useState('')
+    const [pathInput, setPathInput] = useState('')
     const [highlightToggle, setHighlightToggle] = useState(false)
 
     const toggleHighlight = () => {
