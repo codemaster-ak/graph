@@ -9,6 +9,7 @@ export const HIGHLIGHT_POINT_COLOR = '#f00'
 export const HIGHLIGHT_CONNECTION_COLOR = '#f00'
 
 export const BASE_URL = 'http://127.0.0.1:4000'
+export const BASE_URL2 = 'http://127.0.0.1:4001'
 
 export const HTTP_METHODS = {
     GET: 'GET',
@@ -24,6 +25,15 @@ export const BASE_INIT = {
         Accept: 'application/json',
         protocol: 'http',
         'Content-Type': 'application/json',
+    },
+}
+
+export const HTML_INIT = {
+    mode: 'cors',
+    headers: {
+        Accept: 'text/html',
+        protocol: 'http',
+        'Content-Type': 'text/html',
     },
 }
 

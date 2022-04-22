@@ -1,7 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Radio, Select} from 'antd';
 import {BUTTON_WIDTH, COMPUTE_METHODS} from '../consts';
-import {getAllFileNames, getFileById, remove, save, update} from '../functions/http';
+import {
+    getAllFileNames,
+    getFileById,
+    getPage,
+    options,
+    optionsPlaceholder,
+    remove,
+    save,
+    update
+} from '../functions/http';
 import Point from '../classes/Point';
 import Connection from '../classes/Connection';
 
@@ -28,6 +37,12 @@ const Controls = ({
 
     useEffect(() => {
         loadFiles()
+    }, [])
+
+    useEffect(() => {
+        getPage().then()
+        options().then()
+        optionsPlaceholder().then()
     }, [])
 
     const loadFiles = () => {
@@ -96,9 +111,12 @@ const Controls = ({
 
     return <div>
         <div className="margin-bottom-lg">
-            <Radio.Group className="item space-between" buttonStyle="solid" value={selectedMethod} onChange={event => setSelectedMethod(event.target.value)}>
-                <Radio.Button value={COMPUTE_METHODS.Dijkstra} style={{width: BUTTON_WIDTH / 2 - 2, textAlign: "center"}}>Дейкстра</Radio.Button>
-                <Radio.Button value={COMPUTE_METHODS.Floyd} style={{width: BUTTON_WIDTH / 2 - 2, textAlign: "center"}}>Флойд</Radio.Button>
+            <Radio.Group className="item space-between" buttonStyle="solid" value={selectedMethod}
+                         onChange={event => setSelectedMethod(event.target.value)}>
+                <Radio.Button value={COMPUTE_METHODS.Dijkstra}
+                              style={{width: BUTTON_WIDTH / 2 - 2, textAlign: "center"}}>Дейкстра</Radio.Button>
+                <Radio.Button value={COMPUTE_METHODS.Floyd}
+                              style={{width: BUTTON_WIDTH / 2 - 2, textAlign: "center"}}>Флойд</Radio.Button>
             </Radio.Group>
         </div>
         <div className="flex-column margin-bottom-lg">

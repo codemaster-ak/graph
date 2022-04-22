@@ -1,4 +1,4 @@
-import {Button, Layout, Menu, message} from 'antd';
+import {Button, Layout, message} from 'antd';
 import React, {useState} from 'react';
 import Content from './Content';
 import ResultTableModal from './components/ResultTableModal';

@@ -2,17 +2,52 @@ const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const cors = require('cors')
-const {HOST, PORT} = require("./consts")
-const {toBaseColours} = require("./functions/toBaseColours")
+const {HOST, PORT} = require('./consts')
+const {toBaseColours} = require('./functions/toBaseColours')
 
 const app = express()
 
-app.use(cors())
+// app.use(cors())
+// app.use(function(req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+//     next();
+// });
 app.use(express.json())
 
 app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}/`))
 
-app.get('', (req, res) => {
+app.options("/", (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    res.header('Access-Control-Allow-Headers', '*')
+    res.header('Access-Control-Expose-Headers', '*')
+    res.sendStatus(200)
+})
+
+app.get('/page', (req, res) => {
+    const HTMLContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>\n` + Object.entries(process.env).map(([key, value]) => {
+            return `<p>${key}: ${value}</p>`
+        }).join('\n')
+        + `\n</body>
+</html>`
+    fs.open(path.resolve(__dirname, 'public', 'index.html'), 'w', (err) => {
+        if (err) throw err
+    })
+    fs.writeFile(path.resolve(__dirname, 'public', 'index.html'), HTMLContent, (err) => {
+        if (err) throw err
+        res.sendFile(path.join(__dirname, 'public', 'index.html'))
+    })
+});
+
+app.get('/', (req, res) => {
     fs.readdir(path.resolve(__dirname, 'files'), (err, files) => {
         if (err) {
             fs.mkdir(path.resolve(__dirname, 'files'), (err) => {
@@ -22,7 +57,7 @@ app.get('', (req, res) => {
         } else {
             const response = files.map(file => {
                 return {
-                    title: file
+                    title: file,
                 }
             })
             res.status(200).json(response)
@@ -72,6 +107,12 @@ app.post('/', (req, res) => {
     })
 })
 
+app.post('/test', (req, res) => {
+    const body = req.body
+    body.type = 'Response'
+    if (body) res.status(201).json(body)
+})
+
 app.put('/', (req, res) => {
     let matrix = JSON.parse(JSON.stringify(req.body))
     matrix = toBaseColours(matrix)
@@ -100,6 +141,6 @@ app.delete('/:fileName', (req, res) => {
     })
 })
 
-app.options('/', (req, res) => {
-    console.log(res)
-})
+// app.options('/', function (req, res) {
+//     res.status(200).send(sendOptions())
+// })
