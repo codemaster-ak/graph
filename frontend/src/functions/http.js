@@ -38,13 +38,13 @@ export async function save(payload) {
     })
 }
 
-export async function update(payload) {
+export async function update(payload, fileName) {
     const init = {
         ...BASE_INIT,
         method: HTTP_METHODS.PUT,
         body: JSON.stringify(payload),
     }
-    return fetch(BASE_URL, init).then((response) => {
+    return fetch(BASE_URL + '/' + fileName, init).then((response) => {
         if (response.ok) return response.json()
     }).then((data) => {
         return data

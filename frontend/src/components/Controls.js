@@ -40,9 +40,9 @@ const Controls = ({
     }, [])
 
     useEffect(() => {
-        getPage().then()
-        options().then()
-        optionsPlaceholder().then()
+        // getPage().then()
+        // options().then()
+        // optionsPlaceholder().then()
     }, [])
 
     const loadFiles = () => {
@@ -71,7 +71,7 @@ const Controls = ({
     }
 
     const updateFile = async () => {
-        await update({matrix: incMatrix, fileName: selectedFile})
+        await update(incMatrix, selectedFile)
     }
 
     const deleteFile = () => {
@@ -120,7 +120,6 @@ const Controls = ({
             </Radio.Group>
         </div>
         <div className="flex-column margin-bottom-lg">
-
             <div className="space-between">
                 <Select
                     placeholder="От"
@@ -146,7 +145,6 @@ const Controls = ({
                     })}
                 </Select>
             </div>
-
             <Button
                 type="primary"
                 onClick={computePath}
@@ -156,7 +154,6 @@ const Controls = ({
             >
                 Найти кратчайший путь
             </Button>
-
             <Button
                 type="primary"
                 onClick={event => addPoint(event)}
@@ -176,7 +173,6 @@ const Controls = ({
                 Добавить связь
             </Button>
         </div>
-
         <div className="flex-column margin-bottom-lg">
             <Select
                 placeholder="Выберите матрицу"

@@ -1,9 +1,10 @@
 import React, {useRef, useState} from 'react';
-import {Circle, Layer, Line, Stage, Text} from "react-konva";
+import {Circle, Image, Layer, Line, Stage, Text} from "react-konva";
 import Border from "./Border";
 import {SIZE, STAGE_SIZE} from "../consts";
 import Connection from "../classes/Connection";
 import {createConnectionPoints, getConnectionCoords, getMousePos, hasIntersection} from "../functions/canvasFunctions";
+import useImage from "../hooks/useImage";
 
 const Canvas = ({
                     points,
@@ -21,6 +22,8 @@ const Canvas = ({
                 }) => {
 
     const stageRef = useRef(undefined)
+
+    const [imageElement, imageRef] = useImage('./file.png')
 
     const [selectedPoint, setSelectedPoint] = useState(undefined)
     const [connectionPreview, setConnectionPreview] = useState(null)
@@ -208,13 +211,22 @@ const Canvas = ({
         } else return null
     })
 
+    const animation = () => {
+        const duration = 0.5
+        imageRef.current.to({
+            x: Math.random() * 100 + 80,
+            y: Math.random() * 100 + 80,
+            duration: duration,//todo длина пути
+        })
+    }
+
     return <Stage
         width={STAGE_SIZE}
         height={STAGE_SIZE}
         onDblClick={event => addPoint(event, stageRef)}
         onContextMenu={event => onContextMenu(event)}
         ref={stageRef}
-        className='flex-center padding'
+        className='padding'
     >
         <Layer>
             {/** порядок borders и pointObjs не менять */}
@@ -225,6 +237,14 @@ const Canvas = ({
             {borders}
             {pointObjs}
             {pointTitles}
+            {/*<Image*/}
+            {/*    ref={imageRef}*/}
+            {/*    image={imageElement}*/}
+            {/*    x={100 - 6}*/}
+            {/*    y={100 - 8}*/}
+            {/*    draggable*/}
+            {/*    onClick={animation}*/}
+            {/*/>*/}
         </Layer>
     </Stage>
 }
